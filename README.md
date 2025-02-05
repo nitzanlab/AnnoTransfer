@@ -22,16 +22,16 @@ It will conveniently be used by all .sh scripts to determine the location of you
 Replace `<annoTransfer_installation>` with the full path to the location you cloned the library to (click `I` to enter edit mode, `esc` to quit mode).
 Other paths can remain as they are if you're not making additional changes.
 (Use `:wq` to save the file and exit)
-From this point, `$(PROJECT_DIR)` refers to the path you set. It's recommended you add it to your environment for convenience.
+From this point, `$PROJECT_DIR` refers to the path you set. It's recommended you add it to your environment for convenience.
 ### 3.Install virtual environment
-Run `$(PROJECT_DIR)\Scripts\build_venv.sh`.
+Run `$(PROJECT_DIR)/Scripts/build_venv.sh`.
 ### 4.Run
 #### 4.1 Linear Run
 In a linear run, each composition will start training and reporting loss only once the one that preceded it completed.
-1. Edit the global parameter as you wish in `$(PROJECT_DIR)\Linear_run\optimal_compositions.sbatch`.
-2. If a machine with SLURM is available (such as phoenix) run `$(PROJECT_DIR)\Linear_run\optimal_compositions.sbatch`.
-Otherwise, run `$(PROJECT_DIR)\Linear_run\optimal_compositions.py` directly.
+1. Edit the global parameter as you wish in `$(PROJECT_DIR)/Linear_run/optimal_compositions.sbatch`.
+2. If a machine with SLURM is available (such as phoenix) run `$PROJECT_DIR/Linear_run/optimal_compositions.sbatch`.
+Otherwise, run `$PROJECT_DIR/Linear_run/optimal_compositions.py` directly.
 #### 4.2 Parallel Run (recommended)
 In a parallel run, first a csv will be created with all compositions required. Then, workers will be dispatched until all compositions results were reported to `Results` directory.
-1. Edit the global parameter as you wish in `$(PROJECT_DIR)\Parallel_run\tasker.py`.
-2. On a machine with SLURM (such as phoenix) run `$(PROJECT_DIR)\Parallel_run\tasker_and_dispatcher.sh`.
+1. Edit the global parameter as you wish in `$PROJECT_DIR/Parallel_run/tasker.py`.
+2. On a machine with SLURM (such as phoenix) run `$PROJECT_DIR/Parallel_run/tasker_and_dispatcher.sh`.
