@@ -12,8 +12,8 @@ Use `vi ~/.config/annoTransfer.conf` and paste the following into the newly crea
 ```
 # ~/.config/annoTransfer.conf
 export PROJECT_DIR="<annoTransfer_installation>"  # Change this to your clone path
-export VENV_PATH="$PROJECT_DIR/$VENV_NAME"
 export VENV_NAME="annot_venv"
+export VENV_PATH="$PROJECT_DIR/$VENV_NAME"
 export TMP_DIR="$PROJECT_DIR/tmp"
 export CACHE_DIR="$PROJECT_DIR/cache"
 WORKDIR="$PROJECT_DIR"
