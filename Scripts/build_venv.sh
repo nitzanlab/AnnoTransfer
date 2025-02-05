@@ -2,18 +2,23 @@
 set -e  # Exit on error
 
 # ----------------------
+# Source the Configuration File
+# ----------------------
+source ~/.config/annoTransfer.conf
+
+# ----------------------
 # User Configuration
 # ----------------------
-# 1. Set your project root directory
-PROJECT_DIR="$HOME/annotatability"  # Example: "$HOME/my_project"
+# 1. Project root directory should now be pulled from the config file
+PROJECT_DIR="$PROJECT_DIR"  # Set by the config file
 
 # 2. Virtual environment name and paths
-VENV_NAME="annot_venv"
-VENV_PATH="$PROJECT_DIR/$VENV_NAME"
+VENV_NAME="$VENV_NAME"  # Set by the config file
+VENV_PATH="$VENV_PATH"  # Set by the config file
 
 # 3. Temporary directories configuration
-TMPDIR_PATH="$PROJECT_DIR/tmp"        # Custom TMPDIR
-CACHE_DIR_PATH="$PROJECT_DIR/cache"   # Custom pip cache
+TMPDIR_PATH="$TMP_DIR"        # Custom TMPDIR (set by the config file)
+CACHE_DIR_PATH="$CACHE_DIR"   # Custom pip cache (set by the config file)
 
 # 4. Requirements file location
 REQUIREMENTS_FILE="$PROJECT_DIR/requirements.txt"
