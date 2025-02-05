@@ -8,10 +8,7 @@ Utilizing compositions according to the Annotatability model to detect optimal s
 ### 1.Clone the library. 
 Sufficiently large space is required for many of the tasks and datasets. For phoenix cluster users, it's therefore recommended to clone it to their lab directory.
 ### 2.Set up configuration files
-Create the following file in the path `~/.config/annoTransfer.conf`
-It will conveniently be used by all .sh scripts to determine the location of your installations in a single place.
-Replace `<annoTransfer_installation>` with the full path to the location you cloned the library to.
-Other paths can remain as they are if you're not making additional changes.
+Use `vi ~/.config/annoTransfer.conf` and paste the following into the newly created file:
 ```
 # ~/.config/annoTransfer.conf
 export PROJECT_DIR="<annoTransfer_installation>"  # Change this to your clone path
@@ -21,6 +18,10 @@ export TMP_DIR="$PROJECT_DIR/tmp"
 export CACHE_DIR="$PROJECT_DIR/cache"
 WORKDIR="$PROJECT_DIR"
 ```
+It will conveniently be used by all .sh scripts to determine the location of your installations in a single place.
+Replace `<annoTransfer_installation>` with the full path to the location you cloned the library to.
+Other paths can remain as they are if you're not making additional changes.
+(Use `:wq` to save the filr and exit)
 From this point, `$(PROJECT_DIR)` refers to the path you set. It's recommended you add it to your environment for convenience.
 ### 3.Install virtual environment
 Run `$(PROJECT_DIR)\Scripts\build_venv.sh`.
