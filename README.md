@@ -24,11 +24,11 @@ Other paths can remain as they are if you're not making additional changes.
 (Use `:wq` to save the file and exit)
 From this point, `$PROJECT_DIR` refers to the path you set. It's recommended you add it to your environment for convenience.
 ### 3.Install virtual environment
-Run `$(PROJECT_DIR)/Scripts/build_venv.sh`.
+Run `$PROJECT_DIR/Scripts/build_venv.sh`.
 ### 4.Run
 #### 4.1 Linear Run
 In a linear run, each composition will start training and reporting loss only once the one that preceded it completed.
-1. Edit the global parameter as you wish in `$(PROJECT_DIR)/Linear_run/optimal_compositions.sbatch`.
+1. Edit the global parameter as you wish in `$PROJECT_DIR/Linear_run/optimal_compositions.sbatch`.
 2. If a machine with SLURM is available (such as phoenix) run `$PROJECT_DIR/Linear_run/optimal_compositions.sbatch`.
 Otherwise, run `$PROJECT_DIR/Linear_run/optimal_compositions.py` directly.
 #### 4.2 Parallel Run (recommended)
