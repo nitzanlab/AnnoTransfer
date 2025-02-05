@@ -19,9 +19,9 @@ export CACHE_DIR="$PROJECT_DIR/cache"
 WORKDIR="$PROJECT_DIR"
 ```
 It will conveniently be used by all .sh scripts to determine the location of your installations in a single place.
-Replace `<annoTransfer_installation>` with the full path to the location you cloned the library to.
+Replace `<annoTransfer_installation>` with the full path to the location you cloned the library to (click `I` to enter edit mode, `esc` to quit mode).
 Other paths can remain as they are if you're not making additional changes.
-(Use `:wq` to save the filr and exit)
+(Use `:wq` to save the file and exit)
 From this point, `$(PROJECT_DIR)` refers to the path you set. It's recommended you add it to your environment for convenience.
 ### 3.Install virtual environment
 Run `$(PROJECT_DIR)\Scripts\build_venv.sh`.
