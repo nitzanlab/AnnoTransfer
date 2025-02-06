@@ -1,26 +1,21 @@
 #!/bin/bash
 
-# ----------------------
-# User Configuration
-# ----------------------
-# 1. Set lab dependency path (for PYTHONPATH)
-LAB_DIR="/cs/labs/ravehb/idan724"
+# Load shared configuration
+source ~/.config/annotatability.conf || exit 1
+: "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
 
-# 2. Set the path to the project directory
-PROJECT_DIR="$LAB_DIR/AnnoTransfer"
-
-# 3. Set virtual environment path
-VENV_PATH="$LAB_DIR/annot_venv/bin/activate"
-
-# 4. Set script locations
+# Set script locations
 TASKER_SCRIPT="$PROJECT_DIR/Parallel_run/tasker.py"
 WORKER_SCRIPT="$PROJECT_DIR/Parallel_run/worker_script.py"
 
-# 5. Configure job parameters
+# ----------------------
+# User Configuration
+# ----------------------
+
 CSV_FILE="pbmc_healthy_worker_jobs.csv"
 RESULTS_DIR="results"
-CHUNK_SIZE=200
-MAX_JOBS_IN_QUEUE=1000
+CHUNK_SIZE=200 # Number of jobs script will submit at once
+MAX_JOBS_IN_QUEUE=1000 # script will wait if this many jobs are already in queue
 
 # ----------------------
 # Path Validation

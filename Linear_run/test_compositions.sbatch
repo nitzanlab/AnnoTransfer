@@ -5,16 +5,7 @@ set -e
 source ~/.config/annotatability.conf || exit 1
 : "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
 
-# Derived paths
-VENV_PATH="$PROJECT_DIR/$VENV_NAME"
-REQUIREMENTS_FILE="$PROJECT_DIR/requirements.txt"
-
-echo "=== Setting up virtual environment: $VENV_NAME ==="
-
-# Create directories
-mkdir -p "$TMP_DIR" "$CACHE_DIR"
-
-# 4. Set the name of the dataset you want to run
+# Set the name of the dataset you want to run
 DATASET_NAME="pbmc_healthy"
 ### USER CONFIGURATION END ###
 
