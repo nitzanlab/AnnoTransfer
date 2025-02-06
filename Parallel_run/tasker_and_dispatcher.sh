@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load shared configuration
-source ~/.config/annotatability.conf || exit 1
+source ~/.config/annoTransfer.conf || exit 1
 : "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
 
 # Set script locations
