@@ -12,6 +12,7 @@ repeats_per_size = 4
 train_sizes = [1000]
 ### END GLOBAL PARAMETERS ###
 
+### DATASET ###
 dataset = PBMC()
 dataset.load_data()
 adata = dataset.preprocess_data()
@@ -22,6 +23,7 @@ epoch_num_composition = 15
 swap_probability = 0.1
 percentile = 90
 batch_size = 64
+### END DATASET ###
 
 format_manager = AnnDataManager()
 

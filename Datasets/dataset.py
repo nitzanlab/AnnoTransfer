@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from anndata import AnnData
+from Managers.anndata_manager import AnnData
 
 class Dataset(ABC):
     @abstractmethod

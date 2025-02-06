@@ -3,7 +3,7 @@ from dataset import Dataset
 import scanpy as sc
 import squidpy as sq
 import logging
-FILE_PATH = "/cs/labs/ravehb/idan724/annotatability/datasets/pbmc/dfb51f99-a306-4daa-9f4a-afe7de65bbf2.h5ad"
+FILE_PATH = "$PROJECT_DIR/Datasets/pbmc_cvid.h5ad"
 HEALTHY_LABEL = 'normal'
 HEALTH_COLUMN = 'disease'
 
