@@ -17,16 +17,6 @@ RESULTS_DIR="results"
 CHUNK_SIZE=200 # Number of jobs script will submit at once
 MAX_JOBS_IN_QUEUE=1000 # script will wait if this many jobs are already in queue
 
-# ----------------------
-# Path Validation
-# ----------------------
-validate_path() {
-    if [ ! -e "$1" ]; then
-        echo "ERROR: Required path not found - $1"
-        exit 1
-    fi
-}
-
 validate_path "$VENV_PATH"
 validate_path "$LAB_DIR"
 validate_path "$TASKER_SCRIPT"
