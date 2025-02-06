@@ -45,11 +45,13 @@ Each Dataset should configured according to the interface determined in `Dataset
 Two existing example for implementation can be found in:
 - `Datasets/merfish.py`
 - `Datasets/pbmc.py`
+
 (If haven't done so already - run 
 ```
 wget -O $PROJECT_DIR/datasets/pbmc_cvid.h5ad "https://datasets.cellxgene.cziscience.com/dfb51f99-a306-4daa-9f4a-afe7de65bbf2.h5ad"
 ```
 to get the PBMC dataset used by the implementation.
 )
+
 New datasets should be added to the same folder and follow the same convention.
 Any extra function can be incorporated as well in the dataset's .py file - PBMC allows to filter by sick and healthy patients for one via the `filter_by_health` func.
