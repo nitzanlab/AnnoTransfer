@@ -21,6 +21,13 @@ DATASET_NAME="pbmc_healthy"
 # Create output directory
 mkdir -p "${WORKDIR}/slurm_out"
 
+# Validate critical paths
+if [ ! -f "$VENV_PATH" ]; then
+    echo "ERROR: Virtual environment not found at $VENV_PATH"
+    echo "Please create virtual environment or update VENV_PATH in the script"
+    exit 1
+fi
+
 if [ ! -d "$PROJECT_DIR" ]; then
     echo "ERROR: Project directory not found at $PROJECT_DIR"
     echo "Please clone the project or update PROJECT_DIR in the script"
