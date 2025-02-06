@@ -27,7 +27,9 @@ From this point, `$PROJECT_DIR` refers to the path you set. It's recommended you
 Run `$PROJECT_DIR/Scripts/build_venv.sh`.
 ### 4.Run
 We we'll demonstrate running on a PBMC CVID dataset. To obtain it, run:
-`wget -O $PROJECT_DIR/datasets/pbmc_cvid.h5ad "https://datasets.cellxgene.cziscience.com/dfb51f99-a306-4daa-9f4a-afe7de65bbf2.h5ad"`
+```
+wget -O $PROJECT_DIR/datasets/pbmc_cvid.h5ad "https://datasets.cellxgene.cziscience.com/dfb51f99-a306-4daa-9f4a-afe7de65bbf2.h5ad"
+```
 For more details on datasets, see relevant section.
 #### 4.1 Parallel Run (recommended)
 In a parallel run, first a csv will be created with all compositions required. Then, workers will be dispatched until all compositions results were reported to `Results` directory.
