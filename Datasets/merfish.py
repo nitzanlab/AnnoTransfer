@@ -1,5 +1,5 @@
 
-from dataset import Dataset
+from Datasets.dataset import Dataset
 import scanpy as sc
 import squidpy as sq
 

@@ -38,18 +38,40 @@ export PYTHONPATH="$PROJECT_DIR:${PYTHONPATH:-}"
 # Script Logic
 # ----------------------
 
+echo "Submitting tasker job"
 # Run the tasker as sbatch job
 job_id=$(sbatch --parsable << EOF
 #!/bin/bash
 #SBATCH --time=00:20:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-source "$VENV_PATH"
-echo "Environmental details:"
-python3 -u "$TASKER_SCRIPT"
+#SBATCH --output=slurm-%j.out
+#SBATCH --error=slurm-%j.err
+export PYTHONUNBUFFERED=1
+export PYTHONIOENCODING=UTF-8
+export PYTHONPATH="\$PYTHONPATH:$PROJECT_DIR"
+source "$VENV_PATH/bin/activate"
+python3 -u "$TASKER_SCRIPT" 2>&1
 EOF
 )
 
+# Wait for the SLURM output file to be created
+output_file="slurm-${job_id}.out"
+while [ ! -f "$output_file" ]; do
+    sleep 1
+done
+
+# Show real-time output in terminal
+tail -F "$output_file" &
+tail_pid=$!
+
+# Cleanup function
+cleanup() {
+    kill $tail_pid 2>/dev/null
+}
+trap cleanup EXIT
+
+# Wait for job completion
 while squeue -j "$job_id" 2>/dev/null | grep -q "$job_id"; do
     sleep 10
 done
