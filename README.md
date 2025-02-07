@@ -36,6 +36,8 @@ For more details on datasets, see relevant section.
 In a parallel run, first a csv will be created with all compositions required. Then, workers will be dispatched until all compositions results were reported to `Results` directory.
 1. Edit the global parameter or the used dataset if you wish in `$PROJECT_DIR/Parallel_run/tasker.py`. Here you can control batch size, subsets size, repeats, the dataset used etc.
 2. On a machine with SLURM (such as phoenix) run `$PROJECT_DIR/Parallel_run/tasker_and_dispatcher.sh`.
+
+For details and help see Parallel Run section.
 #### 4.2 Linear Run
 In a linear run, each composition will start training and reporting loss only once the one that preceded it completed.
 1. Edit the global parameter if you wish in `$PROJECT_DIR/Linear_run/optimal_compositions.sbatch`. Here you can control batch size, subsets size, repeats, the dataset used etc.
@@ -56,3 +58,13 @@ to get the PBMC dataset used by the implementation.
 
 New datasets should be added to the same folder and follow the same convention.
 Any extra function can be incorporated as well in the dataset's .py file - PBMC allows to filter by sick and healthy patients for one via the `filter_by_health` func.
+## Parallel Run
+Parallel run can conviniently be executed using a single shell script `Parallel_run/tasker_and_dispatcher.sh`. It consists of two stages exaplained below.
+1. Creating the tasks that should be preformed.
+
+Implemented in `Parallel_run/tasker.py` and has two parts:
+1.1. The dataset is annotated with the easy, ambiguous and hard to learn using the `annotate` func in the `Scripts/annotability_automations.py`. This process can be several hours long for a dataset the size of PBMC CVID, even only for healthy patients, so the annoated vestion will be saved for future runs as `<dataset_name>_annotated.h5ad`. Any time `annotate` is called, it will first look for the annotated version to save time.
+
+1.2. Creating a csv where each row is a single composition (i.e. easy 10%, ambigious 80%, hard 10%) that should be trained and tested. These are the 'tasks'. The csv's name is defined as an enviornment variable. The function implementing this is `create_comps_for_workers` under `Scripts/annotability_automations.py`.
+
+2. Submitting workers to execute each of the tasks in csv. The dispatcher calling the wotker can be found in `Parallel_run/tasker_and_dispatcher.sh`. And the script each such worker executes is implemented in `Parallel_run/worker_script.py`.
