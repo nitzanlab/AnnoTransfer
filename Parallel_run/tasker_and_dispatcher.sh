@@ -33,6 +33,7 @@ validate_path "$WORKER_SCRIPT"
 
 # define for python where to look for modules
 export PYTHONPATH="$PROJECT_DIR:${PYTHONPATH:-}"
+export PROJECT_DIR
 
 # ----------------------
 # Script Logic

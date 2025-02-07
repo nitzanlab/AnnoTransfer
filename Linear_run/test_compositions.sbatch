@@ -41,6 +41,7 @@ python --version
 
 # define for python where to look for modules
 export PYTHONPATH="$PROJECT_DIR:${PYTHONPATH:-}"
+export PROJECT_DIR
 
 # Start Python script
 python3 -u "${PROJECT_DIR}/optimal_compositions.py" ${DATASET_NAME}

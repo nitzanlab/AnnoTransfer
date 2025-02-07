@@ -3,7 +3,9 @@ from Datasets.dataset import Dataset
 import scanpy as sc
 import squidpy as sq
 import logging
-FILE_PATH = "$PROJECT_DIR/Datasets/pbmc_cvid.h5ad"
+import os
+
+FILE_PATH = os.path.join(os.environ['PROJECT_DIR'], "Datasets", "pbmc_cvid.h5ad")
 HEALTHY_LABEL = 'normal'
 HEALTH_COLUMN = 'disease'
 
