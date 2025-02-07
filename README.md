@@ -22,7 +22,7 @@ It will conveniently be used by all .sh scripts to determine the location of you
 Replace `<annoTransfer_installation>` with the **full path** to the location you cloned the library to (click `I` to enter edit mode, `esc` to quit mode).
 Other paths can remain as they are if you're not making additional changes.
 (Use `:wq` to save the file and exit)
-From this point, `$PROJECT_DIR` refers to the path you set. It's recommended you add it to your environment for convenience.
+Now run `source ~/.config/annoTransfer.conf` to apply the variables to your enviornment. Use that command whenever you wish to access them (scripts in the library ue them by default).
 ### 3.Install virtual environment
 Run `$PROJECT_DIR/Scripts/build_venv.sh`.
 ### 4.Run
