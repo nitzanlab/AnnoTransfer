@@ -31,6 +31,9 @@ validate_path "$VENV_PATH"
 validate_path "$TASKER_SCRIPT"
 validate_path "$WORKER_SCRIPT"
 
+# define for python where to look for modules
+export PYTHONPATH="$PROJECT_DIR:${PYTHONPATH:-}"
+
 # ----------------------
 # Script Logic
 # ----------------------
