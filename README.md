@@ -60,9 +60,10 @@ New datasets should be added to the same folder and follow the same convention.
 Any extra function can be incorporated as well in the dataset's .py file - PBMC allows to filter by sick and healthy patients for one via the `filter_by_health` func.
 ## Parallel Run
 Parallel run can conviniently be executed using a single shell script `Parallel_run/tasker_and_dispatcher.sh`. It consists of two stages exaplained below.
-1. Creating the tasks that should be preformed.
 
+1. Creating the tasks that should be preformed.
 Implemented in `Parallel_run/tasker.py` and has two parts:
+
 1.1. The dataset is annotated with the easy, ambiguous and hard to learn using the `annotate` func in the `Scripts/annotability_automations.py`. This process can be several hours long for a dataset the size of PBMC CVID, even only for healthy patients, so the annoated vestion will be saved for future runs as `<dataset_name>_annotated.h5ad`. Any time `annotate` is called, it will first look for the annotated version to save time.
 
 1.2. Creating a csv where each row is a single composition (i.e. easy 10%, ambigious 80%, hard 10%) that should be trained and tested. These are the 'tasks'. The csv's name is defined as an enviornment variable. The function implementing this is `create_comps_for_workers` under `Scripts/annotability_automations.py`.
