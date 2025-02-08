@@ -6,7 +6,8 @@ source ~/.config/annoTransfer.conf || exit 1
 : "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
 : "${DATASET_NAME:?}" "${TRANS_DATASET_NAME:?}"
 
-# SLURM Configuration (unchanged)
+# SLURM Configuration
+#SBATCH --job-name=test_compositions
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1,vmem:32G
 #SBATCH --cpus-per-task=16

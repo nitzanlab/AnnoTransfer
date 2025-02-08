@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#SBATCH --job-name=main_controller
+#SBATCH --job-name=main_controller_.%j
 #SBATCH --time=3-00:00:00
-#SBATCH --output=main_controller.out
-#SBATCH --error=main_controller.err
+#SBATCH --output=main_controller_%j.out
+#SBATCH --error=main_controller_%j.err
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 
@@ -46,11 +46,12 @@ export PROJECT_DIR
 echo "Submitting tasker job for dataset: $DATASET_NAME..."
 tasker_job_id=$(sbatch --parsable << EOF
 #!/bin/bash
+#SBATCH --job-name=tasker_${DATASET_NAME}
 #SBATCH --time=12:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --output=tasker_%j.out
-#SBATCH --error=tasker_%j.err
+#SBATCH --output=tasker_${DATASET_NAME}_%j.out
+#SBATCH --error=tasker_${DATASET_NAME}_%j.err
 export PYTHONUNBUFFERED=1
 export PYTHONIOENCODING=UTF-8
 source "$VENV_PATH/bin/activate"
@@ -118,6 +119,7 @@ for ((i=0; i<NUM_CHUNKS; i++)); do
     while true; do
         submission_output=$(sbatch --parsable <<EOT 2>&1
 #!/bin/bash
+#SBATCH --job-name=worker_${DATASET_NAME}_chunk_${i}
 #SBATCH --array=0-$((CHUNK_SIZE-1))
 #SBATCH --time=5:00:00
 #SBATCH --mem=16G
