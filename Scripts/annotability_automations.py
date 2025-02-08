@@ -112,9 +112,10 @@ def assign_annotations(adata, all_conf, all_var, cutoff_conf, cutoff_var, annota
     logging.info('Annotation assignment complete.')
     return adata
 
-def annotate(dataset_name, label_key, epoch_num, device, swap_probability, percentile, batch_size):
-    logging.info('Starting annotation process...')
+def annotate(dataset_name):
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
+    logging.info('Starting annotation process...')
     dataset = get_dataset(dataset_name)
     
     try: 
@@ -124,22 +125,21 @@ def annotate(dataset_name, label_key, epoch_num, device, swap_probability, perce
     
     except FileNotFoundError:
         adata = dataset.adata  # Use the non-annotated dataset
-
-    prob_list = train_and_get_prob_list(adata, label_key=label_key, epoch_num=epoch_num, 
-                                    device=device, batch_size=batch_size)
-    all_conf, all_var = calculate_confidence_and_variability(prob_list, n_obs=adata.n_obs, 
-                                                                epoch_num=epoch_num)
-    conf_cutoff, var_cutoff = find_cutoffs(adata, label_key, device, 
-                                            probability=swap_probability, 
-                                            percentile=percentile, 
-                                            epoch_num=epoch_num)
-    adata = assign_annotations(adata, all_conf, all_var, conf_cutoff, var_cutoff, 
-                                annotation_col='Annotation')
-    adata.write(dataset_name + '_annotated.h5ad')
-    group_counts = adata.obs['Annotation'].value_counts()
-    logging.info('Annotation process complete.')
-    logging.info('Group counts: %s', group_counts.to_dict())
-    return adata
+        prob_list = train_and_get_prob_list(adata, label_key=dataset.label_key, epoch_num=dataset.epoch_num_annot, 
+                                        device=device, batch_size=dataset.batch_size)
+        all_conf, all_var = calculate_confidence_and_variability(prob_list, n_obs=adata.n_obs, 
+                                                                    epoch_num=dataset.epoch_num_annot)
+        conf_cutoff, var_cutoff = find_cutoffs(adata, dataset.label_key, device, 
+                                                probability=dataset.swap_probability, 
+                                                percentile=dataset.percentile, 
+                                                epoch_num=dataset.epoch_num_annot)
+        adata = assign_annotations(adata, all_conf, all_var, conf_cutoff, var_cutoff, 
+                                    annotation_col='Annotation')
+        adata.write(dataset_name + '_annotated.h5ad')
+        group_counts = adata.obs['Annotation'].value_counts()
+        logging.info('Annotation process complete.')
+        logging.info('Group counts: %s', group_counts.to_dict())
+        return adata
 
 def find_optimal_compositions(
     dataset_name,
