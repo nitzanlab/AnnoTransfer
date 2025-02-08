@@ -41,18 +41,28 @@ class PBMC(Dataset):
         # Store original normalized data in a NEW layer
         self.adata.layers['original_normalized'] = self.adata.X.copy()
         
-        # 2. Filter and scale
+        # 2. Handle missing values
+        # -------------------------
+        # Convert to dense array if sparse
+        if scipy.sparse.issparse(self.adata.X):
+            self.adata.X = self.adata.X.toarray()
+        
+        # Replace NaN values with 0 (or impute if preferred)
+        import numpy as np
+        self.adata.X[np.isnan(self.adata.X)] = 0
+        
+        # 3. Filter and scale
         sc.pp.filter_genes(self.adata, min_cells=1)
         sc.pp.filter_cells(self.adata, min_genes=1)
         sc.pp.scale(self.adata)
         
-        # 3. Perform PCA
+        # 4. Perform PCA
         sc.tl.pca(self.adata, n_comps=100, svd_solver='randomized')
         
-        # 4. Store original features BEFORE modifying the object
+        # 5. Store original features BEFORE modifying the object
         original_features = self.adata.var_names.copy()
         
-        # 5. Replace X with PCA components while preserving original structure
+        # 6. Replace X with PCA components while preserving original structure
         # ---------------------------------------------------------------------
         # Create dimension-aligned PCA matrix
         pca_matrix = self.adata.obsm['X_pca']
@@ -66,7 +76,7 @@ class PBMC(Dataset):
             }
         )
         
-        # 6. Rebuild AnnData IN PLACE
+        # 7. Rebuild AnnData IN PLACE
         # ---------------------------
         # Preserve critical metadata
         original_obs = self.adata.obs.copy()
@@ -82,7 +92,7 @@ class PBMC(Dataset):
             obsm=original_obsm
         )
         
-        # 7. Store original features for reference
+        # 8. Store original features for reference
         self.adata.uns['original_features'] = original_features
         
         return self.adata
