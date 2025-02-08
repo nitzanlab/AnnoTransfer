@@ -63,7 +63,7 @@ EOF
 )
 
 echo "Tasker job submitted with ID: $tasker_job_id"
-echo "Monitoring tasker output in tasker_${tasker_job_id}.out..."
+echo "Monitoring tasker output in tasker_${DATASET_NAME}_${tasker_job_id}.out..."
 
 # Wait for SLURM files to be created
 while [ ! -f "tasker_${DATASET_NAME}_${tasker_job_id}.out" ] || [ ! -f "tasker_${DATASET_NAME}_${tasker_job_id}.err" ]; do
@@ -71,7 +71,7 @@ while [ ! -f "tasker_${DATASET_NAME}_${tasker_job_id}.out" ] || [ ! -f "tasker_$
 done
 
 # Show real-time output in terminal (both .out and .err)
-tail -F "tasker_${tasker_job_id}.out" "tasker_${tasker_job_id}.err" &
+tail -F "tasker_${DATASET_NAME}_${tasker_job_id}.out" "tasker_${DATASET_NAME}_${tasker_job_id}.err" &
 tail_pid=$!
 
 cleanup() {

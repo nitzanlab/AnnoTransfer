@@ -14,6 +14,7 @@ class PBMC(Dataset):
     def load_data(self):
         # Load data and save it as an instance attribute
         self.adata_pbmc = sc.read_h5ad(FILE_PATH)
+        self.n_pca_components = 100  # Reduced to 100 principal components
         self.adata_pbmc = self.preprocess_data()
         self.label_key = 'cell_type'
 
@@ -21,7 +22,6 @@ class PBMC(Dataset):
         self.adata_pbmc.uns['original_features'] = self.adata_pbmc.var_names.copy()
         
         # Parameters for pbmc (full)
-        self.n_pca_components = 100  # Reduced to 100 principal components
         self.epoch_num_annot = 40
         self.epoch_num_composition = 20
         self.swap_probability = 0.1
