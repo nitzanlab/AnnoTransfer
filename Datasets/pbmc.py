@@ -5,6 +5,8 @@ import squidpy as sq
 import logging
 import os
 import pandas as pd
+import numpy as np
+import scipy
 
 FILE_PATH = os.path.join(os.environ['PROJECT_DIR'], "Datasets", "pbmc_cvid.h5ad")
 HEALTHY_LABEL = 'normal'
@@ -33,12 +35,21 @@ class PBMC(Dataset):
         return self.adata_pbmc
 
     def preprocess_data(self):
-        # Normalize and log-transform the data
+        # Normalize total (skip if already normalized)
         sc.pp.normalize_total(self.adata_pbmc, target_sum=1e4)
-        sc.pp.log1p(self.adata_pbmc)
         
-        # Store normalized data in layers
+        # Store normalized data in layers before any other processing
         self.adata_pbmc.layers['normalized'] = self.adata_pbmc.X.copy()
+        
+        # Handle missing values before scaling
+        sc.pp.filter_genes(self.adata_pbmc, min_cells=1)  # Remove genes that are all-zero
+        sc.pp.filter_cells(self.adata_pbmc, min_genes=1)  # Remove cells that are all-zero
+        
+        # Handle remaining NaN values by imputation
+        if scipy.sparse.issparse(self.adata_pbmc.X):
+            self.adata_pbmc.X = self.adata_pbmc.X.toarray()
+        mask = np.isnan(self.adata_pbmc.X)
+        self.adata_pbmc.X[mask] = 0  # Replace NaN with zeros
         
         # Scale data for PCA
         sc.pp.scale(self.adata_pbmc)
@@ -56,7 +67,7 @@ class PBMC(Dataset):
             )
         )
         
-        # Copy important attributes from original AnnData
+        # Copy important attributes
         adata_pca.uns = self.adata_pbmc.uns
         adata_pca.obsm = self.adata_pbmc.obsm
         
