@@ -65,26 +65,31 @@ EOF
 echo "Tasker job submitted with ID: $tasker_job_id"
 echo "Monitoring tasker output in tasker_${tasker_job_id}.out..."
 
-# Wait for the SLURM output file to be created
-output_file="tasker_${tasker_job_id}.out"
-while [ ! -f "$output_file" ]; do
+# Wait for SLURM files to be created
+while [ ! -f "tasker_${tasker_job_id}.out" ] || [ ! -f "tasker_${tasker_job_id}.err" ]; do
     sleep 1
 done
 
-# Show real-time output in terminal
-tail -F "$output_file" &
+# Show real-time output in terminal (both .out and .err)
+tail -F "tasker_${tasker_job_id}.out" "tasker_${tasker_job_id}.err" &
 tail_pid=$!
 
 # Cleanup function
 cleanup() {
     kill $tail_pid 2>/dev/null
 }
-trap cleanup EXIT # Makes sure tail_pid is killed when script exits
+trap cleanup EXIT
 
 # Wait for job completion
 while squeue -j "$tasker_job_id" 2>/dev/null | grep -q "$tasker_job_id"; do
     sleep 10
 done
+
+# Check job status
+if ! sacct -j "$tasker_job_id" --format=State | grep -q "COMPLETED"; then
+    echo "ERROR: Tasker job $tasker_job_id failed. Check tasker_${tasker_job_id}.err"
+    exit 1
+fi
 
 # 1) Create results directory
 mkdir -p "$RESULTS_DIR"
