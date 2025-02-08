@@ -2,7 +2,6 @@
 
 import argparse
 import logging
-from pathlib import Path
 import torch
 from Scripts.annotability_automations import *
 from Datasets.dataset import *
@@ -19,7 +18,7 @@ def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
     logger.info(f"Starting tasker for dataset: {args.dataset}")
-    dataset = get_dataset(args.dataset_name)
+    dataset = get_dataset(args.dataset)
     format_manager.general_info(adata)
     adata, group_counts = annotate(args.dataset, dataset.get_annotated_dataset(), dataset.label_key, dataset.epoch_num_annot, 
                                         device, dataset.swap_probability, dataset.percentile, dataset.batch_size)

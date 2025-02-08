@@ -66,7 +66,7 @@ echo "Tasker job submitted with ID: $tasker_job_id"
 echo "Monitoring tasker output in tasker_${tasker_job_id}.out..."
 
 # Wait for SLURM files to be created
-while [ ! -f "tasker_${tasker_job_id}.out" ] || [ ! -f "tasker_${tasker_job_id}.err" ]; do
+while [ ! -f "tasker_${DATASET_NAME}_${tasker_job_id}.out" ] || [ ! -f "tasker_${DATASET_NAME}_${tasker_job_id}.err" ]; do
     sleep 1
 done
 
@@ -74,7 +74,6 @@ done
 tail -F "tasker_${tasker_job_id}.out" "tasker_${tasker_job_id}.err" &
 tail_pid=$!
 
-# Cleanup function
 cleanup() {
     kill $tail_pid 2>/dev/null
 }
