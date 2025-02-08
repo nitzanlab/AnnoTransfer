@@ -46,15 +46,18 @@ class PBMC(Dataset):
         # Scale and PCA
         sc.pp.scale(self.adata)
         sc.tl.pca(self.adata, n_comps=100, svd_solver='randomized')
-
-        # Create new var for PCA components
+        
+        # 1. Replace X with PCA components
+        self.adata.X = self.adata.obsm['X_pca']
+        
+        # 2. Update var to match PCA dimensions
         self.adata.var = pd.DataFrame(
             index=[f'PC{i+1}' for i in range(100)],
             data={'variance': self.adata.uns['pca']['variance_ratio']}
         )
-
-        # Replace X with PCA components
-        self.adata.X = self.adata.obsm['X_pca']
+        
+        # 3. Store original features in uns
+        self.adata.uns['original_features'] = self.adata.layers['normalized'].var_names.copy()
         
         return self.adata
 
