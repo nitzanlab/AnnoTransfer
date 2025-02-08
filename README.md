@@ -77,11 +77,11 @@ You can use any of the SLURM command using the job_id provided at the start of t
 
 To see the logs use :
 ```
-cat main_controller.out main_controller.err
+cat $PROJECT_DIR/main_controller.out $PROJECT_DIR/main_controller.err
 ```
 To start following them again:
 ```
-tail -F main_controller.out main_controller.err
+tail -F $PROJECT_DIR/main_controller.out $PROJECT_DIR/main_controller.err
 ```
 To check if the job still runs and more details:
 ```
