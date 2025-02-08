@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#SBATCH --job-name=main_controller
+#SBATCH --time=3-00:00:00
+#SBATCH --output=main_controller.out
+#SBATCH --error=main_controller.err
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+
 # Load shared configuration
 source ~/.config/annoTransfer.conf || exit 1
 : "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
@@ -39,15 +46,14 @@ export PROJECT_DIR
 # Script Logic
 # ----------------------
 
-echo "Submitting tasker job"
-# Run the tasker as sbatch job
+echo "Submitting tasker job..."
 job_id=$(sbatch --parsable << EOF
 #!/bin/bash
 #SBATCH --time=12:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --output=slurm-%j.out
-#SBATCH --error=slurm-%j.err
+#SBATCH --output=tasker_%j.out
+#SBATCH --error=tasker_%j.err
 export PYTHONUNBUFFERED=1
 export PYTHONIOENCODING=UTF-8
 export PYTHONPATH="\$PYTHONPATH:$PROJECT_DIR"
@@ -56,8 +62,11 @@ python3 -u "$TASKER_SCRIPT" 2>&1
 EOF
 )
 
+echo "Tasker job submitted with ID: $job_id"
+echo "Monitoring tasker output in tasker_${job_id}.out..."
+
 # Wait for the SLURM output file to be created
-output_file="slurm-${job_id}.out"
+output_file="tasker_${job_id}.out"
 while [ ! -f "$output_file" ]; do
     sleep 1
 done
@@ -70,7 +79,7 @@ tail_pid=$!
 cleanup() {
     kill $tail_pid 2>/dev/null
 }
-trap cleanup EXIT
+trap cleanup EXIT # makes sure tail_pid is killed when script exits
 
 # Wait for job completion
 while squeue -j "$job_id" 2>/dev/null | grep -q "$job_id"; do
@@ -115,8 +124,8 @@ for ((i=0; i<NUM_CHUNKS; i++)); do
 #SBATCH --time=5:00:00
 #SBATCH --mem=16G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=${RESULTS_DIR}/out.%A_%a
-#SBATCH --error=${RESULTS_DIR}/err.%A_%a
+#SBATCH --output=${RESULTS_DIR}/logs/out.%A_%a
+#SBATCH --error=${RESULTS_DIR}/logs/err.%A_%a
 #SBATCH --killable
 #SBATCH --requeue
 
