@@ -46,20 +46,26 @@ class PBMC(Dataset):
         # Scale and PCA
         sc.pp.scale(self.adata)
         sc.tl.pca(self.adata, n_comps=100, svd_solver='randomized')
-        
-        # 1. Replace X with PCA components
-        self.adata.X = self.adata.obsm['X_pca']
-        
-        # 2. Update var to match PCA dimensions
-        self.adata.var = pd.DataFrame(
-            index=[f'PC{i+1}' for i in range(100)],
-            data={'variance': self.adata.uns['pca']['variance_ratio']}
+
+        # 1. Create a new AnnData object with PCA components
+        adata_pca = sc.AnnData(
+            X=self.adata.obsm['X_pca'],  # PCA-reduced data
+            obs=self.adata.obs,          # Keep cell metadata
+            var=pd.DataFrame(            # Create new var for PCA components
+                index=[f'PC{i+1}' for i in range(100)],
+                data={'variance': self.adata.uns['pca']['variance_ratio']}
+            )
         )
         
-        # 3. Store original features in uns
-        self.adata.uns['original_features'] = self.adata.layers['normalized'].var_names.copy()
+        # 2. Copy important attributes
+        adata_pca.uns = self.adata.uns
+        adata_pca.obsm = self.adata.obsm
+        adata_pca.layers = self.adata.layers
         
-        return self.adata
+        # 3. Store original features in uns
+        adata_pca.uns['original_features'] = self.adata.var_names.copy()
+        
+        return adata_pca
 
     def filter_by_health(self, clear_sick=True, normalize_again=False):
         if HEALTH_COLUMN not in self.adata.obs.columns:
