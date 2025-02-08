@@ -3,6 +3,7 @@ Utilizing compositions according to the Annotatability model to detect optimal s
 
 ## Tips
 - The task of iteratively searching through all compositions is an expensive one that takes long. It's therefore recommended to run the tasks via the optimized .sh scripts available, which create sbatch jobs rather than .ipynb notebooks.
+- The provided datasets were preprocessed according to the authours discertion. Make sure to check that they match your excpectations. See `Datasets/<dataset name>.py`.
 
 ## Getting Started
 ### 1.Clone the library. 
@@ -17,6 +18,8 @@ export VENV_PATH="$PROJECT_DIR/$VENV_NAME"
 export TMP_DIR="$PROJECT_DIR/tmp"
 export CACHE_DIR="$PROJECT_DIR/cache"
 WORKDIR="$PROJECT_DIR"
+export DATASET_NAME="pbmc_healthy" # change if want work on a different one
+export TRANS_DATASET_NAME="pbmc_sick" # change if want to work on a different one
 ```
 
 Replace `<annoTransfer_installation>` with the **full path** to the location you cloned the library to (click `I` to enter edit mode, `esc` to quit mode).
@@ -77,11 +80,11 @@ You can use any of the SLURM command using the job_id provided at the start of t
 
 To see the logs use :
 ```
-cat $PROJECT_DIR/main_controller.out $PROJECT_DIR/main_controller.err
+cat $PROJECT_DIR/main_controller_<job_id>.out $PROJECT_DIR/main_controller_<job_id>.err
 ```
 To start following them again:
 ```
-tail -F $PROJECT_DIR/main_controller.out $PROJECT_DIR/main_controller.err
+tail -F $PROJECT_DIR/main_controller_<job_id>.out $PROJECT_DIR/main_controller_<job_id>.err
 ```
 To check if the job still runs and more details:
 ```
