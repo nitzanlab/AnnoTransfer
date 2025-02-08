@@ -74,6 +74,7 @@ Parallel run can conviniently be executed using a single shell script `Parallel_
 
 ### Keeping track of the job
 You can use any of the SLURM command using the job_id provided at the start of the run with `Tasker job submitted with ID: <job_id>`. 
+
 To see the logs use :
 ```
 cat main_controller.out main_controller.err
@@ -82,7 +83,7 @@ To start following them again:
 ```
 tail -F main_controller.out main_controller.err
 ```
-TO check if the job still runs and more details:
+To check if the job still runs and more details:
 ```
 scontrol show job <job_id>
 ```
