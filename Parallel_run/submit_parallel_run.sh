@@ -7,4 +7,4 @@ source ~/.config/annoTransfer.conf || exit 1
 # run tasker and dispatcher
 job_id=$(sbatch $PROJECT_DIR/Parallel_run/tasker_and_dispatcher.sh | awk '{print $4}') && \
 echo "Tasker job submitted with ID: $job_id" && \
-tail -F main_controller.out main_controller.err
+tail -F main_controller_$job_id.out main_controller_$job_id.err
