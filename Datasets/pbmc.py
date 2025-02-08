@@ -46,16 +46,21 @@ class PBMC(Dataset):
         # Perform PCA
         sc.tl.pca(self.adata_pbmc, n_comps=self.n_pca_components, svd_solver='arpack')
         
-        # Update var to match PCA components
-        self.adata_pbmc.var = pd.DataFrame(
-            index=[f'PC{i+1}' for i in range(self.n_pca_components)],
-            columns=['pca_component']
+        # Create a new AnnData object with PCA components
+        adata_pca = sc.AnnData(
+            X=self.adata_pbmc.obsm['X_pca'],
+            obs=self.adata_pbmc.obs,
+            var=pd.DataFrame(
+                index=[f'PC{i+1}' for i in range(self.n_pca_components)],
+                columns=['pca_component']
+            )
         )
         
-        # Replace X with PCA components
-        self.adata_pbmc.X = self.adata_pbmc.obsm['X_pca']
+        # Copy important attributes from original AnnData
+        adata_pca.uns = self.adata_pbmc.uns
+        adata_pca.obsm = self.adata_pbmc.obsm
         
-        return self.adata_pbmc
+        return adata_pca
 
     def filter_by_health(self, clear_sick=True, normalize_again=False):
         if HEALTH_COLUMN not in self.adata_pbmc.obs.columns:
