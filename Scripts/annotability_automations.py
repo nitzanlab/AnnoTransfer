@@ -112,22 +112,30 @@ def assign_annotations(adata, all_conf, all_var, cutoff_conf, cutoff_var, annota
     logging.info('Annotation assignment complete.')
     return adata
 
-def annotate(dataset_name, adata, label_key, epoch_num, device, swap_probability, percentile, batch_size):
+def annotate(dataset_name, label_key, epoch_num, device, swap_probability, percentile, batch_size):
     logging.info('Starting annotation process...')
     
     dataset = get_dataset(dataset_name)
+    
     try: 
-        dataset.get_annotated_dataset()
+        adata = dataset.get_annotated_dataset()
         logging.info('Loaded existing annotated dataset.')
-        return dataset.get_annotated_dataset()
+        return adata
     
     except FileNotFoundError:
-        prob_list = train_and_get_prob_list(adata, label_key=label_key, epoch_num=epoch_num, device=device, batch_size=batch_size)
-        all_conf, all_var = calculate_confidence_and_variability(prob_list, n_obs=adata.n_obs, epoch_num=epoch_num)
-        conf_cutoff, var_cutoff = find_cutoffs(adata, label_key, device, probability=swap_probability, percentile=percentile, epoch_num=epoch_num)
-        adata = assign_annotations(adata, all_conf, all_var, conf_cutoff, var_cutoff, annotation_col='Annotation')
-        adata.write(dataset_name + '_annotated.h5ad')
-    
+        adata = dataset.adata  # Use the non-annotated dataset
+
+    prob_list = train_and_get_prob_list(adata, label_key=label_key, epoch_num=epoch_num, 
+                                    device=device, batch_size=batch_size)
+    all_conf, all_var = calculate_confidence_and_variability(prob_list, n_obs=adata.n_obs, 
+                                                                epoch_num=epoch_num)
+    conf_cutoff, var_cutoff = find_cutoffs(adata, label_key, device, 
+                                            probability=swap_probability, 
+                                            percentile=percentile, 
+                                            epoch_num=epoch_num)
+    adata = assign_annotations(adata, all_conf, all_var, conf_cutoff, var_cutoff, 
+                                annotation_col='Annotation')
+    adata.write(dataset_name + '_annotated.h5ad')
     group_counts = adata.obs['Annotation'].value_counts()
     logging.info('Annotation process complete.')
     logging.info('Group counts: %s', group_counts.to_dict())

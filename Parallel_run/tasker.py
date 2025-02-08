@@ -20,7 +20,7 @@ def main():
     logger.info(f"Starting tasker for dataset: {args.dataset}")
     dataset = get_dataset(args.dataset)
     format_manager.general_info(dataset.adata)
-    adata, group_counts = annotate(args.dataset, dataset.get_annotated_dataset(), dataset.label_key, dataset.epoch_num_annot, 
+    adata = annotate(args.dataset, dataset.get_annotated_dataset(), dataset.label_key, dataset.epoch_num_annot, 
                                         device, dataset.swap_probability, dataset.percentile, dataset.batch_size)
     create_comps_for_workers(
         args.dataset, adata,
