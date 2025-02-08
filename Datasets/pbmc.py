@@ -26,7 +26,7 @@ class PBMC(Dataset):
         self.epoch_num_annot = 40
         self.epoch_num_composition = 20
         self.swap_probability = 0.1
-        self.percentile = 90
+        self.percentile = 20
         self.batch_size = 64
         self.manager = AnnDataManager()
         self.name = "pbmc"

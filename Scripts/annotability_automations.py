@@ -453,13 +453,14 @@ def create_comps_for_workers(
         test_indices_str = ",".join(map(str, test_indices))
 
         # step_size logic
-        step_size = max(1, T // 20)
+        step_size = max(1, T // 100)
 
         # Generate all compositions (e,a,h) summing to T
         compositions = []
         for e in range(0, min(T, E_count) + 1, step_size):
             if include_hard:
                 for a in range(0, min(T - e, A_count) + 1, step_size):
+                    h = T - e - a
                     if 0 <= h <= H_count:
                         compositions.append((e, a, h))
             else:
