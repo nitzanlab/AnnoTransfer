@@ -43,7 +43,7 @@ echo "Submitting tasker job"
 # Run the tasker as sbatch job
 job_id=$(sbatch --parsable << EOF
 #!/bin/bash
-#SBATCH --time=04:00:00
+#SBATCH --time=12:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --output=slurm-%j.out
