@@ -7,6 +7,9 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 
+echo "Starting main controller script..."
+echo "output file: main_controller_%j.out"
+
 # Load shared configuration
 source ~/.config/annoTransfer.conf || exit 1
 : "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
@@ -59,11 +62,11 @@ python3 -u "$TASKER_SCRIPT" --dataset "$DATASET_NAME"
 EOF
 )
 
-echo "Tasker job submitted with ID: $job_id"
-echo "Monitoring tasker output in tasker_${job_id}.out..."
+echo "Tasker job submitted with ID: $tasker_job_id"
+echo "Monitoring tasker output in tasker_${tasker_job_id}.out..."
 
 # Wait for the SLURM output file to be created
-output_file="tasker_${job_id}.out"
+output_file="tasker_${tasker_job_id}.out"
 while [ ! -f "$output_file" ]; do
     sleep 1
 done
@@ -79,7 +82,7 @@ cleanup() {
 trap cleanup EXIT # Makes sure tail_pid is killed when script exits
 
 # Wait for job completion
-while squeue -j "$job_id" 2>/dev/null | grep -q "$job_id"; do
+while squeue -j "$tasker_job_id" 2>/dev/null | grep -q "$tasker_job_id"; do
     sleep 10
 done
 
