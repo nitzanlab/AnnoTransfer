@@ -49,7 +49,10 @@ class PBMC(Dataset):
         # 3. Perform PCA
         sc.tl.pca(self.adata, n_comps=100, svd_solver='randomized')
         
-        # 4. Replace X with PCA components while preserving original structure
+        # 4. Store original features BEFORE modifying the object
+        original_features = self.adata.var_names.copy()
+        
+        # 5. Replace X with PCA components while preserving original structure
         # ---------------------------------------------------------------------
         # Create dimension-aligned PCA matrix
         pca_matrix = self.adata.obsm['X_pca']
@@ -63,7 +66,7 @@ class PBMC(Dataset):
             }
         )
         
-        # 5. Rebuild AnnData IN PLACE
+        # 6. Rebuild AnnData IN PLACE
         # ---------------------------
         # Preserve critical metadata
         original_obs = self.adata.obs.copy()
@@ -79,8 +82,8 @@ class PBMC(Dataset):
             obsm=original_obsm
         )
         
-        # 6. Store original features for reference
-        self.adata.uns['original_features'] = self.adata.uns['original_features']
+        # 7. Store original features for reference
+        self.adata.uns['original_features'] = original_features
         
         return self.adata
 
