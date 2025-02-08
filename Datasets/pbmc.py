@@ -46,14 +46,14 @@ class PBMC(Dataset):
         # Perform PCA
         sc.tl.pca(self.adata_pbmc, n_comps=self.n_pca_components, svd_solver='arpack')
         
-        # Replace X with PCA components
-        self.adata_pbmc.X = self.adata_pbmc.obsm['X_pca']
-        
-        # Create PCA-aware var DataFrame
+        # Update var to match PCA components
         self.adata_pbmc.var = pd.DataFrame(
             index=[f'PC{i+1}' for i in range(self.n_pca_components)],
             columns=['pca_component']
         )
+        
+        # Replace X with PCA components
+        self.adata_pbmc.X = self.adata_pbmc.obsm['X_pca']
         
         return self.adata_pbmc
 
