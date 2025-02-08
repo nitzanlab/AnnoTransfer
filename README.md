@@ -35,10 +35,10 @@ For more details on datasets, see relevant section.
 #### 4.1 Parallel Run (recommended)
 In a parallel run, first a csv will be created with all compositions required. Then, workers will be dispatched until all compositions results were reported to `Results` directory.
 1. Edit the global parameter or the used dataset if you wish in `$PROJECT_DIR/Parallel_run/tasker.py`. Here you can control batch size, subsets size, repeats, the dataset used etc.
-2. On a machine with SLURM (such as phoenix) run `$PROJECT_DIR/Parallel_run/tasker_and_dispatcher.sh`.
+2. On a machine with SLURM (such as phoenix) run `$PROJECT_DIR/Parallel_run/submit_parallel_run.sh`.
 
 Note this can still take **very** long time, espicially for the PBMC dataset configured by default. 
-
+However the script you just ran starts an up to days-long job on the cluster, so whenever you log out you can log back in and check on the progress. Keep the id provided in `Tasker job submitted with ID: <job_id>` to check on it later.
 For details and help see Parallel Run section.
 #### 4.2 Linear Run
 In a linear run, each composition will start training and reporting loss only once the one that preceded it completed.
@@ -71,3 +71,18 @@ Parallel run can conviniently be executed using a single shell script `Parallel_
 
    1.2. Creating a csv where each row is a single composition (i.e. easy 10%, ambigious 80%, hard 10%) that should be trained and tested. These are the 'tasks'. The csv's name is defined as an enviornment variable. The function implementing this is `create_comps_for_workers` under `Scripts/annotability_automations.py`.
 2. Submitting workers to execute each of the tasks in csv. The dispatcher calling the wotker can be found in `Parallel_run/tasker_and_dispatcher.sh`. And the script each such worker executes is implemented in `Parallel_run/worker_script.py`.
+
+### Keeping track of the job
+You can use any of the SLURM command using the job_id provided at the start of the run with `Tasker job submitted with ID: <job_id>`. 
+To see the logs use :
+```
+cat main_controller.out main_controller.err
+```
+To start following them again:
+```
+tail -F main_controller.out main_controller.err
+```
+TO check if the job still runs and more details:
+```
+scontrol show job <job_id>
+```
