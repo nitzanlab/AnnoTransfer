@@ -13,12 +13,8 @@ from Models.mlp_net import train_and_evaluate_mlp
 from Datasets.pbmc import PBMC
 from Managers.anndata_manager import AnnDataManager
 from Scripts.annotability_automations import get_subset_composition
-
-###############################################################################
-# Constants / Configuration
-###############################################################################
-DATASET = "pbmc_healthy"  # Must match the actual H5AD file prefix
-LABEL_KEY = "cell_type"
+from Datasets.dataset import Dataset
+from Datasets.factory import get_dataset
 
 ###############################################################################
 # Worker function
@@ -26,11 +22,9 @@ LABEL_KEY = "cell_type"
 def worker_run_job(
     csv_file: str,
     row_id: int,
-    device: str = "cpu",
-    epoch_num: int = 25,
-    batch_size: int = 64,
-    model_name: str = "mlp",
-    output_dir: str = "results"
+    output_dir: str,
+    dataset_name: str,
+
 ):
     """
     Reads a single row from `csv_file` (pbmc_healthy_worker_jobs.csv),
@@ -43,6 +37,10 @@ def worker_run_job(
 
     os.makedirs(output_dir, exist_ok=True)
     logging.info(f"[Worker] Starting worker_run_job, row_id={row_id}.")
+    dataset = get_dataset(dataset_name)
+    device = "cpu"
+    epoch_num = dataset.epoch_num_composition
+    batch_size = dataset.batch_size
 
     # -------------------------------------------------------------------------
     # 1) Read the job row from CSV
@@ -84,11 +82,8 @@ def worker_run_job(
     # -------------------------------------------------------------------------
     # 2) Load the (pre-annotated) PBMC dataset
     # -------------------------------------------------------------------------
-    adata_path = DATASET + "_annotated.h5ad"  # e.g. pbmc_healthy_annotated.h5ad
-    if not os.path.exists(adata_path):
-        raise FileNotFoundError(f"[Worker] Could not find file '{adata_path}'. "
-                                "Please ensure it exists with the correct name.")
-    adata = sc.read(adata_path)
+    adata = dataset.get_annotated_dataset()
+    label_key = dataset.label_key
     logging.info(f"[Worker] Loaded PBMC dataset shape: {adata.shape}")
 
     # Subset test data
@@ -129,13 +124,13 @@ def worker_run_job(
                 # 5) Run training
                 # -----------------------------------------------------------------
                 device_torch = torch.device(device if torch.cuda.is_available() else "cpu")
-                label_encoder = manager.getLabelEncoder(adata, label_key=LABEL_KEY)
+                label_encoder = manager.getLabelEncoder(adata, label_key)
 
                 try:
                     test_loss = train_and_evaluate_mlp(
                         adata_train=train_adata,
                         adata_test=test_adata,
-                        label_key=LABEL_KEY,
+                        label_key=label_key,
                         label_encoder=label_encoder,
                         num_classes=len(label_encoder.classes_),
                         epoch_num=epoch_num,

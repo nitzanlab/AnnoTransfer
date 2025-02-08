@@ -24,6 +24,7 @@ from Models.mlp_net import *
 from Managers.anndata_manager import *
 import csv
 import json
+from Datasets.factory import get_dataset
 
 #TODO: get rid of all label_encoder as inputs and use the dedicated function in the manager
 
@@ -114,11 +115,13 @@ def assign_annotations(adata, all_conf, all_var, cutoff_conf, cutoff_var, annota
 def annotate(dataset_name, adata, label_key, epoch_num, device, swap_probability, percentile, batch_size):
     logging.info('Starting annotation process...')
     
-    if os.path.exists(dataset_name + '_annotated.h5ad'):
-        adata = sc.read(dataset_name + '_annotated.h5ad')
+    dataset = get_dataset(dataset_name)
+    try: 
+        dataset.get_annotated_dataset()
         logging.info('Loaded existing annotated dataset.')
+        return dataset.get_annotated_dataset()
     
-    else:
+    except FileNotFoundError:
         prob_list = train_and_get_prob_list(adata, label_key=label_key, epoch_num=epoch_num, device=device, batch_size=batch_size)
         all_conf, all_var = calculate_confidence_and_variability(prob_list, n_obs=adata.n_obs, epoch_num=epoch_num)
         conf_cutoff, var_cutoff = find_cutoffs(adata, label_key, device, probability=swap_probability, percentile=percentile, epoch_num=epoch_num)
@@ -128,13 +131,12 @@ def annotate(dataset_name, adata, label_key, epoch_num, device, swap_probability
     group_counts = adata.obs['Annotation'].value_counts()
     logging.info('Annotation process complete.')
     logging.info('Group counts: %s', group_counts.to_dict())
-    return adata, group_counts
+    return adata
 
 def find_optimal_compositions(
     dataset_name,
     adata,
     label_key,
-    group_counts,
     train_sizes,
     repeats_per_size,
     device,
@@ -150,7 +152,6 @@ def find_optimal_compositions(
     - dataset_name (str): Name identifier for the dataset (e.g., 'merfish', 'pbmc').
     - adata (AnnData): The dataset to process.
     - label_key (str): The key in adata.obs that contains the labels.
-    - group_counts (dict): Dictionary containing counts for 'Easy-to-learn', 'Ambiguous', 'Hard-to-learn'.
     - train_sizes (list of int): List of training set sizes to experiment with.
     - repeats_per_size (int): Number of repeats for each training size.
     - device (torch.device): The device to run the training on ('cpu' or 'cuda').

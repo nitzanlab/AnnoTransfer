@@ -4,11 +4,7 @@ set -e
 # Load shared configuration
 source ~/.config/annoTransfer.conf || exit 1
 : "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
-
-# Set the name of the dataset you want to run
-DATASET_NAME="pbmc_healthy"
-TRANS_DATASET_NAME="pbmc_sick"
-### USER CONFIGURATION END ###
+: "${DATASET_NAME:?}" "${TRANS_DATASET_NAME:?}"
 
 # SLURM Configuration (unchanged)
 #SBATCH --nodes=1

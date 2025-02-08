@@ -20,7 +20,7 @@ WORKER_SCRIPT="$PROJECT_DIR/Parallel_run/worker_script.py"
 # User Configuration
 # ----------------------
 CSV_FILE="${DATASET_NAME}_worker_jobs.csv"
-RESULTS_DIR="results"
+RESULTS_DIR="results_${DATASET_NAME}"
 CHUNK_SIZE=200 # Number of jobs script will submit at once
 MAX_JOBS_IN_QUEUE=1000 # script will wait if this many jobs are already in queue
 
@@ -135,11 +135,8 @@ if [ "\$ROW_ID" -le "$END" ]; then
     srun python "$WORKER_SCRIPT" \\
         --csv_file="$CSV_FILE" \\
         --row_id="\$ROW_ID" \\
-        --device="cuda" \\
-        --epoch_num=8 \\
-        --batch_size=128 \\
-        --model_name="mlp" \\
-        --output_dir="results"
+        --output_dir="$RESULTS_DIR"
+        --dataset_name="$DATASET_NAME" \\
 else
     echo "Skipping row \$ROW_ID as it exceeds $END."
 fi

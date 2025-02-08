@@ -34,8 +34,8 @@ batch_size = dataset.batch_size
 format_manager = dataset.manager
 
 format_manager.general_info(adata)
-adata, group_counts = annotate(dataset_name, adata, label_key, epoch_num_annot, device, swap_probability, percentile, batch_size)
-best_compositions, label_encoder = find_optimal_compositions(dataset_name, adata, label_key, group_counts, train_sizes, 
+adata = annotate(dataset_name, adata, label_key, epoch_num_annot, device, swap_probability, percentile, batch_size)
+best_compositions, label_encoder = find_optimal_compositions(dataset_name, adata, label_key, train_sizes, 
                         repeats_per_size, device, epoch_num_composition, batch_size, format_manager)
 visualize_optimal_compositions(dataset_name)
 highest_confidence_samples(adata, train_sizes, device, label_encoder, dataset_name, label_key)
