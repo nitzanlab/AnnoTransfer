@@ -17,7 +17,7 @@ source ~/.config/annoTransfer.conf || exit 1
 #SBATCH --error=slurm_out/err.%j
 
 # Create output directory
-mkdir -p "${WORKDIR}/slurm_out"
+mkdir -p "${PROJECT_DIR}/slurm_out"
 
 # Validate critical paths
 if [ ! -f "$VENV_PATH" ]; then

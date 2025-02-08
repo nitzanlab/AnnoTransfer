@@ -17,7 +17,6 @@ export VENV_NAME="annot_venv"
 export VENV_PATH="$PROJECT_DIR/$VENV_NAME"
 export TMP_DIR="$PROJECT_DIR/tmp"
 export CACHE_DIR="$PROJECT_DIR/cache"
-WORKDIR="$PROJECT_DIR"
 export DATASET_NAME="pbmc_healthy" # change if want work on a different one
 export TRANS_DATASET_NAME="pbmc_sick" # change if want to work on a different one
 ```
