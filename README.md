@@ -37,12 +37,16 @@ In a parallel run, first a csv will be created with all compositions required. T
 1. Edit the global parameter or the used dataset if you wish in `$PROJECT_DIR/Parallel_run/tasker.py`. Here you can control batch size, subsets size, repeats, the dataset used etc.
 2. On a machine with SLURM (such as phoenix) run `$PROJECT_DIR/Parallel_run/tasker_and_dispatcher.sh`.
 
+Note this can still take **very** long time, espicially for the PBMC dataset configured by default. 
+
 For details and help see Parallel Run section.
 #### 4.2 Linear Run
 In a linear run, each composition will start training and reporting loss only once the one that preceded it completed.
 1. Edit the global parameter if you wish in `$PROJECT_DIR/Linear_run/optimal_compositions.sbatch`. Here you can control batch size, subsets size, repeats, the dataset used etc.
 2. If a machine with SLURM is available (such as phoenix) run `$PROJECT_DIR/Linear_run/optimal_compositions.sbatch`.
 Otherwise, run `$PROJECT_DIR/Linear_run/optimal_compositions.py` directly.
+
+Only recommended for small datasets and forgiving compositions constraints.
 ## Datasets
 Each Dataset should configured according to the interface determined in `Datasets/dataset.py`.
 Two existing example for implementation can be found in:
