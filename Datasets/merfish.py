@@ -7,8 +7,8 @@ import squidpy as sq
 class Merfish(Dataset):
     def load_data(self):
         # Load data and save it as an instance attribute
-        self.adata_merfish = sq.datasets.merfish()
-        self.adata_merfish = self.preprocess_data()
+        self.adata = sq.datasets.merfish()
+        self.adata = self.preprocess_data()
 
         # Parameters for merfish
         self.label_key = 'CellType'
@@ -19,11 +19,11 @@ class Merfish(Dataset):
         self.batch_size = 64
         self.manager = AnnDataManager()
 
-        return self.adata_merfish
+        return self.adata
 
     def preprocess_data(self):
-        sc.pp.normalize_per_cell(self.adata_merfish, counts_per_cell_after=1e4)
-        sc.pp.log1p(self.adata_merfish)
+        sc.pp.normalize_per_cell(self.adata, counts_per_cell_after=1e4)
+        sc.pp.log1p(self.adata)
 
         # Map clusters to cell types
         cell_type_mapping = {
@@ -43,5 +43,5 @@ class Merfish(Dataset):
             'Ependymal': 'Ependymal',
             'OD Immature 2': 'OD Immature'
         }
-        self.adata_merfish.obs['CellType'] = self.adata_merfish.obs['Cell_class'].map(cell_type_mapping).fillna(self.adata_merfish.obs['Cell_class'])
-        return self.adata_merfish
+        self.adata.obs['CellType'] = self.adata.obs['Cell_class'].map(cell_type_mapping).fillna(self.adata.obs['Cell_class'])
+        return self.adata
