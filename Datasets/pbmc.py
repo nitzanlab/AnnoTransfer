@@ -16,7 +16,6 @@ class PBMC(Dataset):
     def load_data(self):
         # Load data and save it as an instance attribute
         self.adata = sc.read_h5ad(FILE_PATH)
-        self.n_pca_components = 100  # Reduced to 100 principal components
         self.adata = self.preprocess_data()
         self.label_key = 'cell_type'
 
@@ -35,40 +34,27 @@ class PBMC(Dataset):
         return self.adata
 
     def preprocess_data(self):
-        # Normalize total counts
+        # Normalize and preprocess
         sc.pp.normalize_total(self.adata, target_sum=1e4)
-        
-        # Store normalized data in layers before any other processing
+        sc.pp.log1p(self.adata)
         self.adata.layers['normalized'] = self.adata.X.copy()
-        
-        # Handle missing values before scaling
+
+        # Handle missing values
         sc.pp.filter_genes(self.adata, min_cells=1)
         sc.pp.filter_cells(self.adata, min_genes=1)
         
-        # Handle remaining NaN values by imputation
-        if scipy.sparse.issparse(self.adata.X):
-            self.adata.X = self.adata.X.toarray()
-        mask = np.isnan(self.adata.X)
-        self.adata.X[mask] = 0
-        
-        # Scale data for PCA
+        # Scale and PCA
         sc.pp.scale(self.adata)
-        
-        # Perform PCA
-        sc.tl.pca(
-            self.adata, 
-            n_comps=self.n_pca_components, 
-            svd_solver='randomized'
+        sc.tl.pca(self.adata, n_comps=100, svd_solver='randomized')
+
+        # Create new var for PCA components
+        self.adata.var = pd.DataFrame(
+            index=[f'PC{i+1}' for i in range(100)],
+            data={'variance': self.adata.uns['pca']['variance_ratio']}
         )
 
-        # 1. Store PCA components in X
+        # Replace X with PCA components
         self.adata.X = self.adata.obsm['X_pca']
-        
-        # 2. Update var to match PCA dimensions
-        self.adata.var = pd.DataFrame(
-            index=[f'PC{i+1}' for i in range(self.n_pca_components)],
-            data={'pca_component': [f'PC{i+1}' for i in range(self.n_pca_components)]}
-        )
         
         return self.adata
 
