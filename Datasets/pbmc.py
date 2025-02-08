@@ -34,49 +34,33 @@ class PBMC(Dataset):
         return self.adata
 
     def preprocess_data(self):
-        # 1. Normalize and log-transform
+        # Normalize and handle NaNs
         sc.pp.normalize_total(self.adata, target_sum=1e4)
         sc.pp.log1p(self.adata)
-        
-        # 2. Handle NaN values
         if scipy.sparse.issparse(self.adata.X):
             self.adata.X = self.adata.X.toarray()
         self.adata.X[np.isnan(self.adata.X)] = 0
-        
-        # 3. PCA processing
+
+        # Filter and scale
+        sc.pp.filter_genes(self.adata, min_cells=1)
+        sc.pp.filter_cells(self.adata, min_genes=1)
         sc.pp.scale(self.adata)
+
+        # PCA and metadata
         sc.tl.pca(self.adata, n_comps=100, svd_solver='randomized')
-        
-        # 4. Prepare PCA-compatible structure
-        # --------------------------------
-        # Store original features
-        self.adata.uns['original_features'] = self.adata.var_names.astype(str).tolist()
-        
-        # Create PCA-aware var
-        pca_var = pd.DataFrame(
-            index=[f'PC{i+1}' for i in range(100)],
-            data={
-                'variance_ratio': self.adata.uns['pca']['variance_ratio'],
-                'loading_dtype': 'float32'  # Metadata instead of actual arrays
-            }
-        )
-        
-        # 5. Rebuild AnnData with proper typing
-        # ------------------------------------
+        self.adata.uns['original_features'] = self.adata.var_names.tolist()
+        self.adata.uns['pca_loadings'] = self.adata.varm['PCs'].copy()
+
+        # Rebuild AnnData
         self.adata = sc.AnnData(
-            X=self.adata.obsm['X_pca'].astype(np.float32),
+            X=self.adata.obsm['X_pca'],
             obs=self.adata.obs,
-            var=pca_var,
-            uns=self.adata.uns,
-            obsm=self.adata.obsm,
-            varm={'PCs': self.adata.varm['PCs'].astype(np.float32)}
+            var=pd.DataFrame(
+                index=[f'PC{i+1}' for i in range(100)],
+                data={'variance': self.adata.uns['pca']['variance_ratio']}
+            ),
+            uns=self.adata.uns
         )
-        
-        # 6. Force categorical conversion for HDF5 compatibility
-        self.adata.obs = self.adata.obs.astype({
-            'cell_type': 'category',
-            'disease': 'category'
-        })
         
         return self.adata
 
