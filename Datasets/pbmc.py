@@ -60,22 +60,17 @@ class PBMC(Dataset):
             n_comps=self.n_pca_components, 
             svd_solver='randomized'
         )
+
+        # 1. Store PCA components in X
+        self.adata.X = self.adata.obsm['X_pca']
         
-        # Create a new AnnData object with PCA components
-        adata_pca = sc.AnnData(
-            X=self.adata.obsm['X_pca'],
-            obs=self.adata.obs,
-            var=pd.DataFrame(
-                index=[f'PC{i+1}' for i in range(self.n_pca_components)],
-                columns=['pca_component']
-            )
+        # 2. Update var to match PCA dimensions
+        self.adata.var = pd.DataFrame(
+            index=[f'PC{i+1}' for i in range(self.n_pca_components)],
+            data={'pca_component': [f'PC{i+1}' for i in range(self.n_pca_components)]}
         )
         
-        # Copy important attributes
-        adata_pca.uns = self.adata.uns
-        adata_pca.obsm = self.adata.obsm
-        
-        return adata_pca
+        return self.adata
 
     def filter_by_health(self, clear_sick=True, normalize_again=False):
         if HEALTH_COLUMN not in self.adata.obs.columns:
@@ -85,7 +80,7 @@ class PBMC(Dataset):
             raise ValueError(f"{HEALTHY_LABEL} label not found in {HEALTH_COLUMN} column.")
 
         logging.info(f"Unique values in {HEALTH_COLUMN} column: "
-                     f"{self.adata.obs[HEALTH_COLUMN].unique()})")
+                    f"{self.adata.obs[HEALTH_COLUMN].unique()})")
 
         if clear_sick:
             filter_condition = self.adata.obs[HEALTH_COLUMN] == HEALTHY_LABEL 
