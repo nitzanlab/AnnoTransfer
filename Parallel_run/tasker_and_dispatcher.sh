@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=main_controller_.%j
+#SBATCH --job-name=main_controller
 #SBATCH --time=3-00:00:00
 #SBATCH --output=main_controller_%j.out
 #SBATCH --error=main_controller_%j.err
@@ -8,7 +8,8 @@
 #SBATCH --mem=16G
 
 echo "Starting main controller script..."
-echo "output file: main_controller_%j.out"
+job_id=$SLURM_JOB_ID
+echo "output file: main_controller_$job_id.out"
 
 # Load shared configuration
 source ~/.config/annoTransfer.conf || exit 1
@@ -37,7 +38,6 @@ validate_path() {
 validate_path "$VENV_PATH"
 validate_path "$TASKER_SCRIPT"
 validate_path "$WORKER_SCRIPT"
-validate_path "$CSV_FILE"
 
 # Environment setup
 export PYTHONPATH="$PROJECT_DIR:${PYTHONPATH:-}"
