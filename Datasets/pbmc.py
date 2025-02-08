@@ -1,5 +1,6 @@
 
 from Datasets.dataset import Dataset
+from Managers.anndata_manager import AnnDataManager
 import scanpy as sc
 import squidpy as sq
 import logging
@@ -13,6 +14,18 @@ class PBMC(Dataset):
     def load_data(self):
         # Load data and save it as an instance attribute
         self.adata_pbmc = sc.read_h5ad(FILE_PATH)
+        self.adata_pbmc = self.preprocess_data()
+        self.label_key = 'cell_type'
+
+        # Parameters for pbmc (full)
+        self.epoch_num_annot = 40
+        self.epoch_num_composition = 20
+        self.swap_probability = 0.1
+        self.percentile = 90
+        self.batch_size = 64
+        self.manager = AnnDataManager()
+        self.name = "pbmc"
+
         return self.adata_pbmc
 
     def preprocess_data(self):
@@ -31,7 +44,28 @@ class PBMC(Dataset):
         # print all unique values in HEALTH_COLUMN as a log
         logging.info(f"Unique values in {HEALTH_COLUMN} column: {self.adata_pbmc.obs[HEALTH_COLUMN].unique()})")
 
-        filter_condition = self.adata_pbmc.obs[HEALTH_COLUMN] == HEALTHY_LABEL if clear_sick else self.adata_pbmc.obs[HEALTH_COLUMN] != HEALTHY_LABEL
+        if clear_sick:
+            filter_condition = self.adata_pbmc.obs[HEALTH_COLUMN] == HEALTHY_LABEL 
+            status = "healthy"
+            # parameters for pbmc_healthy
+            self.epoch_num_annot = 50
+            self.epoch_num_composition = 25
+            self.swap_probability = 0.1
+            self.percentile = 90
+            self.batch_size = 64
+            self.name = "pbmc_healthy"
+
+        else:
+            filter_condition = self.adata_pbmc.obs[HEALTH_COLUMN] != HEALTHY_LABEL
+            status = "sick"
+            # parameters for pbmc_sick
+            self.epoch_num_annot = 50
+            self.epoch_num_composition = 25
+            self.swap_probability = 0.1
+            self.percentile = 90
+            self.batch_size = 64
+            self.name = "pbmc_sick"
+
         filtered_adata = self.adata_pbmc[filter_condition].copy()
         
         if filtered_adata.n_obs == 0:
@@ -39,7 +73,6 @@ class PBMC(Dataset):
 
         self.adata_pbmc = filtered_adata
 
-        status = "healthy" if clear_sick else "sick"
         print(f"Filtered {status} cells using HEALTH_COLUMN.")
 
         if normalize_again:

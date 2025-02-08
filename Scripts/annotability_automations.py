@@ -967,12 +967,11 @@ def comp_opt_subset_to_not(
     adata,
     label_key,
     group_counts,
-    device,
     epoch_num_subset,
     epoch_num_full,
     batch_size,
     dataset_manager,
-    repeats_per_size=12,
+    repeats_per_size=5,
     model="mlp",
     random_seed=42
 ):
@@ -990,6 +989,8 @@ def comp_opt_subset_to_not(
       4) Logs the average test loss of 'optimal' and 'random' runs,
          and the single test loss for 'full'.
     """
+
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
     np.random.seed(random_seed)
 

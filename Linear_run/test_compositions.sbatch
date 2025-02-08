@@ -7,6 +7,7 @@ source ~/.config/annoTransfer.conf || exit 1
 
 # Set the name of the dataset you want to run
 DATASET_NAME="pbmc_healthy"
+TRANS_DATASET_NAME="pbmc_sick"
 ### USER CONFIGURATION END ###
 
 # SLURM Configuration (unchanged)
@@ -44,4 +45,4 @@ export PYTHONPATH="$PROJECT_DIR:${PYTHONPATH:-}"
 export PROJECT_DIR
 
 # Start Python script
-python3 -u "${PROJECT_DIR}/optimal_compositions.py" ${DATASET_NAME}
+python3 -u "${PROJECT_DIR}/optimal_compositions.py" ${DATASET_NAME} ${TRANS_DATASET_NAME}
