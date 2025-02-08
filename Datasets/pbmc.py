@@ -34,66 +34,49 @@ class PBMC(Dataset):
         return self.adata
 
     def preprocess_data(self):
-        # 1. Normalize and store original data
+        # 1. Normalize and log-transform
         sc.pp.normalize_total(self.adata, target_sum=1e4)
         sc.pp.log1p(self.adata)
         
-        # Store original normalized data in a NEW layer
-        self.adata.layers['original_normalized'] = self.adata.X.copy()
-        
-        # 2. Handle missing values
-        # -------------------------
-        # Convert to dense array if sparse
+        # 2. Handle NaN values
         if scipy.sparse.issparse(self.adata.X):
             self.adata.X = self.adata.X.toarray()
-        
-        # Replace NaN values with 0 (or impute if preferred)
-        import numpy as np
         self.adata.X[np.isnan(self.adata.X)] = 0
         
-        # 3. Filter and scale
-        sc.pp.filter_genes(self.adata, min_cells=1)
-        sc.pp.filter_cells(self.adata, min_genes=1)
+        # 3. PCA processing
         sc.pp.scale(self.adata)
-        
-        # 4. Perform PCA
         sc.tl.pca(self.adata, n_comps=100, svd_solver='randomized')
         
-        # 5. Store original features BEFORE modifying the object
-        original_features = self.adata.var_names.copy()
+        # 4. Prepare PCA-compatible structure
+        # --------------------------------
+        # Store original features
+        self.adata.uns['original_features'] = self.adata.var_names.astype(str).tolist()
         
-        # 6. Replace X with PCA components while preserving original structure
-        # ---------------------------------------------------------------------
-        # Create dimension-aligned PCA matrix
-        pca_matrix = self.adata.obsm['X_pca']
-        
-        # Create new var for PCA components
-        new_var = pd.DataFrame(
-            index=[f'PC{i+1}' for i in range(pca_matrix.shape[1])],
+        # Create PCA-aware var
+        pca_var = pd.DataFrame(
+            index=[f'PC{i+1}' for i in range(100)],
             data={
                 'variance_ratio': self.adata.uns['pca']['variance_ratio'],
-                'loadings': list(self.adata.varm['PCs'].T)  # Gene loadings per PC
+                'loading_dtype': 'float32'  # Metadata instead of actual arrays
             }
         )
         
-        # 7. Rebuild AnnData IN PLACE
-        # ---------------------------
-        # Preserve critical metadata
-        original_obs = self.adata.obs.copy()
-        original_uns = self.adata.uns.copy()
-        original_obsm = self.adata.obsm.copy()
-        
-        # Create new AnnData object with PCA dimensions
+        # 5. Rebuild AnnData with proper typing
+        # ------------------------------------
         self.adata = sc.AnnData(
-            X=pca_matrix,
-            obs=original_obs,
-            var=new_var,
-            uns=original_uns,
-            obsm=original_obsm
+            X=self.adata.obsm['X_pca'].astype(np.float32),
+            obs=self.adata.obs,
+            var=pca_var,
+            uns=self.adata.uns,
+            obsm=self.adata.obsm,
+            varm={'PCs': self.adata.varm['PCs'].astype(np.float32)}
         )
         
-        # 8. Store original features for reference
-        self.adata.uns['original_features'] = original_features
+        # 6. Force categorical conversion for HDF5 compatibility
+        self.adata.obs = self.adata.obs.astype({
+            'cell_type': 'category',
+            'disease': 'category'
+        })
         
         return self.adata
 
