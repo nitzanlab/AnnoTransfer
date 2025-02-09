@@ -23,8 +23,8 @@ class PBMC(Dataset):
         self.adata.uns['original_features'] = self.adata.var_names.copy()
         
         # Parameters for pbmc (full)
-        self.epoch_num_annot = 100
-        self.epoch_num_composition = 45
+        self.epoch_num_annot = 200
+        self.epoch_num_composition = 60
         self.swap_probability = 0.1
         self.percentile = 90
         self.batch_size = 64
