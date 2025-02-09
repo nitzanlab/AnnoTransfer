@@ -23,10 +23,10 @@ class PBMC(Dataset):
         self.adata.uns['original_features'] = self.adata.var_names.copy()
         
         # Parameters for pbmc (full)
-        self.epoch_num_annot = 40
-        self.epoch_num_composition = 20
+        self.epoch_num_annot = 100
+        self.epoch_num_composition = 45
         self.swap_probability = 0.1
-        self.percentile = 20
+        self.percentile = 90
         self.batch_size = 64
         self.manager = AnnDataManager()
         self.name = "pbmc"
@@ -47,7 +47,7 @@ class PBMC(Dataset):
         sc.pp.scale(self.adata)
 
         # PCA and metadata
-        sc.tl.pca(self.adata, n_comps=100, svd_solver='randomized')
+        sc.tl.pca(self.adata, n_comps=200, svd_solver='randomized')
         self.adata.uns['original_features'] = self.adata.var_names.tolist()
         self.adata.uns['pca_loadings'] = self.adata.varm['PCs'].copy()
 
@@ -56,7 +56,7 @@ class PBMC(Dataset):
             X=self.adata.obsm['X_pca'],
             obs=self.adata.obs,
             var=pd.DataFrame(
-                index=[f'PC{i+1}' for i in range(100)],
+                index=[f'PC{i+1}' for i in range(200)],
                 data={'variance': self.adata.uns['pca']['variance_ratio']}
             ),
             uns=self.adata.uns
