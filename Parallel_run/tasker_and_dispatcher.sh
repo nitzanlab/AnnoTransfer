@@ -92,6 +92,8 @@ fi
 
 # 1) Create results directory
 mkdir -p "$RESULTS_DIR"
+mkdir -p "$RESULTS_DIR/logs"
+mkdir -p "$RESULTS_DIR/analysis"
 
 # 2) Count total data rows
 TOTAL_ROWS=$(($(wc -l < "$CSV_FILE") - 1))
