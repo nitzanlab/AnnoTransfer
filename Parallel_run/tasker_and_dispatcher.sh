@@ -138,7 +138,7 @@ for ((i=0; i<NUM_CHUNKS; i++)); do
 #SBATCH --killable
 #SBATCH --requeue
 
-source "$VENV_PATH"
+source "$VENV_PATH/bin/activate"
 
 ROW_ID=\$((SLURM_ARRAY_TASK_ID + $OFFSET))
 

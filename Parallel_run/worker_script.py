@@ -187,26 +187,17 @@ def main():
                         help="Path to the pbmc_healthy_worker_jobs.csv file.")
     parser.add_argument("--row_id", type=int, required=True,
                         help="0-based row index in the CSV.")
-    parser.add_argument("--device", type=str, default="cpu", choices=["cpu", "cuda"],
-                        help="Device to use for training.")
-    parser.add_argument("--epoch_num", type=int, default=25,
-                        help="Number of training epochs.")
-    parser.add_argument("--batch_size", type=int, default=64,
-                        help="Training batch size.")
-    parser.add_argument("--model_name", type=str, default="mlp",
-                        help="Model runner name if you have multiple.")
-    parser.add_argument("--output_dir", type=str, default="results",
+    parser.add_argument("--output_dir", type=str, required=True,
+                        help="Directory to save JSON files.")
+    parser.add_argument("--dataset_name", type=str, required=True,
                         help="Directory to save JSON files.")
 
     args = parser.parse_args()
     worker_run_job(
         csv_file=args.csv_file,
         row_id=args.row_id,
-        device=args.device,
-        epoch_num=args.epoch_num,
-        batch_size=args.batch_size,
-        model_name=args.model_name,
-        output_dir=args.output_dir
+        output_dir=args.output_dir,
+        dataset_name=args.dataset_name
     )
 
 if __name__ == "__main__":
