@@ -36,7 +36,17 @@ class PBMC(Dataset):
     def preprocess_data(self):
         # Normalize and handle NaNs
         sc.pp.normalize_total(self.adata, target_sum=1e4)
-        sc.pp.log1p(self.adata)
+
+        if scipy.sparse.issparse(self.adata.X):
+            sample = self.adata.X.data[:1000] if len(self.adata.X.data) > 1000 else self.adata.X.data
+        else:
+            sample = self.adata.X.flatten()[:1000]
+        
+        if np.max(sample) <= 30:  # Typical range for log-transformed data
+            logging.info("Data appears to be already log-transformed, skipping log1p")
+        else:
+            sc.pp.log1p(self.adata)
+
         if scipy.sparse.issparse(self.adata.X):
             self.adata.X = self.adata.X.toarray()
         self.adata.X[np.isnan(self.adata.X)] = 0
@@ -90,7 +100,7 @@ class PBMC(Dataset):
             raise ValueError(f"No {status} cells found after filtering.")
 
         self.adata = filtered_adata
-        print(f"Filtered {status} cells using {HEALTH_COLUMN}.")
+        logging.info(f"Filtered {status} cells using {HEALTH_COLUMN}.")
 
         if normalize_again:
             # Re-normalize using stored normalized layer
