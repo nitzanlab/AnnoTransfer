@@ -477,23 +477,20 @@ def create_comps_for_workers(
         for run_idx in range(repeats_per_size):
             # For each composition
             for (e, a, h) in tqdm(compositions,
-                                  desc=f"Preparing job rows for T={T} (Run {run_idx+1})",
-                                  disable=True):
-                # We'll store placeholders for fields we'd normally fill in after training
+                                    desc=f"Preparing job rows for T={T} (Run {run_idx+1})",
+                                    disable=True):
                 job_rows.append({
                     "Train_Size": T,
                     "Run": run_idx + 1,
                     "Easy": e,
                     "Ambiguous": a,
                     "Hard": h,
-                    "Test_Loss": None,
-                    "Train_Indices": None,
                     "Test_Indices": test_indices_str
                 })
 
     # Convert to DataFrame
     columns = ["Train_Size", "Run", "Easy", "Ambiguous", "Hard", "Test_Loss",
-               "Train_Indices", "Test_Indices"]
+                "Train_Indices", "Test_Indices"]
     jobs_df = pd.DataFrame(job_rows, columns=columns)
 
     # Save out to CSV

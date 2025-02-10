@@ -91,6 +91,8 @@ if ! sacct -j "$tasker_job_id" --format=State | grep -q "COMPLETED"; then
 fi
 
 # 1) Create results directory
+# Remove existing results directory if it exists and create fresh structure
+rm -rf "$RESULTS_DIR"
 mkdir -p "$RESULTS_DIR"
 mkdir -p "$RESULTS_DIR/logs"
 mkdir -p "$RESULTS_DIR/analysis"
