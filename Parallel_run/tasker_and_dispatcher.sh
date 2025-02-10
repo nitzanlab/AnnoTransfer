@@ -149,7 +149,7 @@ if [ "\$ROW_ID" -le "$END" ]; then
         --csv_file="$CSV_FILE" \\
         --row_id="\$ROW_ID" \\
         --output_dir="$RESULTS_DIR" \\
-        --dataset_name="$DATASET_NAME" \\
+        --dataset_name="$DATASET_NAME"
 else
     echo "Skipping row \$ROW_ID as it exceeds $END."
 fi
