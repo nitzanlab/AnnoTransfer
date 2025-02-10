@@ -24,7 +24,7 @@ WORKER_SCRIPT="$PROJECT_DIR/Parallel_run/worker_script.py"
 # User Configuration
 # ----------------------
 CSV_FILE="${DATASET_NAME}_worker_jobs.csv"
-RESULTS_DIR="results_${DATASET_NAME}"
+RESULTS_DIR="results_${DATASET_NAME}_$(date +%Y%m%d_%H%M)"
 CHUNK_SIZE=200 # Number of jobs script will submit at once
 MAX_JOBS_IN_QUEUE=1000 # script will wait if this many jobs are already in queue
 

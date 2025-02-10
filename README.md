@@ -25,7 +25,7 @@ Replace `<annoTransfer_installation>` with the **full path** to the location you
 Other paths can remain as they are if you're not making additional changes
 (type `:wq` to save the file and exit).
 
-Now run `source ~/.config/annoTransfer.conf` to apply the variables to your enviornment. Run that command on every session you wish to acess these variables. (scripts in the library use them by default).
+Now run `source ~/.config/annoTransfer.conf` to apply the variables to your environment. Run that command on every session you wish to acess these variables. (scripts in the library use them by default).
 ### 3.Install virtual environment
 Run `$PROJECT_DIR/Scripts/build_venv.sh`.
 ### 4.Run
@@ -39,7 +39,7 @@ In a parallel run, first a csv will be created with all compositions required. T
 1. Edit the global parameter or the used dataset if you wish in `$PROJECT_DIR/Parallel_run/tasker.py`. Here you can control batch size, subsets size, repeats, the dataset used etc.
 2. On a machine with SLURM (such as phoenix) run `$PROJECT_DIR/Parallel_run/submit_parallel_run.sh`.
 
-Note this can still take **very** long time, espicially for the PBMC dataset configured by default. 
+Note this can still take **very** long time, especially for the PBMC dataset configured by default. 
 However the script you just ran starts an up to days-long job on the cluster, so whenever you log out you can log back in and check on the progress. Keep the id provided in `Tasker job submitted with ID: <job_id>` to check on it later.
 For details and help see Parallel Run section.
 #### 4.2 Linear Run
@@ -65,14 +65,18 @@ to get the PBMC dataset used by the implementation.
 New datasets should be added to the same folder and follow the same convention.
 Any extra function can be incorporated as well in the dataset's .py file - PBMC allows to filter by sick and healthy patients for one via the `filter_by_health` func.
 ## Parallel Run
-Parallel run can conviniently be executed using a single shell script `Parallel_run/tasker_and_dispatcher.sh`. It consists of two stages exaplained below.
+Parallel run can conveniently be executed using a single shell script `Parallel_run/tasker_and_dispatcher.sh`. It consists of the three stages explained below.
 
 1. Creating the tasks that should be preformed. Implemented in `Parallel_run/tasker.py` and has two parts:
 
-   1.1. The dataset is annotated with the easy, ambiguous and hard to learn using the `annotate` func in the `Scripts/annotability_automations.py`. This process can be several hours long for a dataset the size of PBMC CVID, even only for healthy patients, so the annoated vestion will be saved for future runs as `<dataset_name>_annotated.h5ad`. Any time `annotate` is called, it will first look for the annotated version to save time.
+   1.1. The dataset is annotated with the easy, ambiguous and hard to learn using the `annotate` func in the `Scripts/annotability_automations.py`. This process can be several hours long for a dataset the size of PBMC CVID, even only for healthy patients, so the annotated version will be saved for future runs as `<dataset_name>_annotated.h5ad`. Any time `annotate` is called, it will first look for the annotated version to save time.
 
-   1.2. Creating a csv where each row is a single composition (i.e. easy 10%, ambigious 80%, hard 10%) that should be trained and tested. These are the 'tasks'. The csv's name is defined as an enviornment variable. The function implementing this is `create_comps_for_workers` under `Scripts/annotability_automations.py`.
-2. Submitting workers to execute each of the tasks in csv. The dispatcher calling the wotker can be found in `Parallel_run/tasker_and_dispatcher.sh`. And the script each such worker executes is implemented in `Parallel_run/worker_script.py`.
+   1.2. Creating a csv where each row is a single composition (i.e. easy 10%, ambiguous 80%, hard 10%) that should be trained and tested. These are the 'tasks'. The csv's name is defined as an environment variable. The function implementing this is `create_comps_for_workers` under `Scripts/annotability_automations.py`.
+2. Submitting workers to execute each of the tasks in csv. The dispatcher calling the worker can be found in `Parallel_run/tasker_and_dispatcher.sh`. And the script each such worker executes is implemented in `Parallel_run/worker_script.py`.
+3. An `Analyzer` script will collect all output from workers and compile it to determine best composition. It will then run comparations on it for both the original dataset and data you transfer to, as determined in `~/.config/annoTransfer.conf`. 
+`Analyzer` can be found in `$PROJECT_DIR/Parallel_run/analyze_results.py` while the comparator can be found in `$PROJECT_DIR/Parallel_run/annotability_automations.py` in func `comp_opt_subset_to_not`.
+See `Results` subsection ahead for more info.
+
 
 ### Keeping track of the job
 You can use any of the SLURM command using the job_id provided at the start of the run with `Tasker job submitted with ID: <job_id>`. 
@@ -89,3 +93,10 @@ To check if the job still runs and more details:
 ```
 scontrol show job <job_id>
 ```
+
+### Results
+The results will be provided at the end of the `tasker and dispatcher` script as part of the log. see above section to access it.
+It is compiled and can be reproduced from the following:
+- Under `$PROJECT_DIR/results_${DATASET_NAME}_$<script start time>` each worker's output will be available.
+- Under `$PROJECT_DIR/results_${DATASET_NAME}_$<script start time>\analysis` the final analyzer's log will be available, and likely the results.
+- Under `$PROJECT_DIR/results_${DATASET_NAME}_$<script start time>\logs` the worker's log can be found, for troubleshooting.
