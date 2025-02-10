@@ -146,7 +146,7 @@ if [ "\$ROW_ID" -le "$END" ]; then
     srun python "$WORKER_SCRIPT" \\
         --csv_file="$CSV_FILE" \\
         --row_id="\$ROW_ID" \\
-        --output_dir="$RESULTS_DIR"
+        --output_dir="$RESULTS_DIR" \\
         --dataset_name="$DATASET_NAME" \\
 else
     echo "Skipping row \$ROW_ID as it exceeds $END."
