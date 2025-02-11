@@ -42,4 +42,4 @@ export PYTHONPATH="$PROJECT_DIR:${PYTHONPATH:-}"
 export PROJECT_DIR
 
 # Start Python script
-python3 -u "${PROJECT_DIR}/optimal_compositions.py" ${DATASET_NAME} ${TRANS_DATASET_NAME}
+python3 -u "${PROJECT_DIR}/Linear_run/optimal_compositions.py" ${DATASET_NAME} ${TRANS_DATASET_NAME}
