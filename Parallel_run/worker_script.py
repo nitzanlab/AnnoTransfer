@@ -61,8 +61,8 @@ def worker_run_job(
     h = int(job_row["Hard"])
     test_indices_str = job_row["Test_Indices"]
     run_id = int(job_row.get("Run", 1))
-    out_file = "results_{train_size}_{run_id}_{e}_{a}_{h}.json"
-
+    out_file = f"results_{train_size}_{run_id}_{e}_{a}_{h}.json"
+    
     # if the output file already exists, skip this job
     out_path = os.path.join(output_dir, out_file)
     if os.path.exists(out_path):
