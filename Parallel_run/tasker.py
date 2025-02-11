@@ -19,7 +19,9 @@ def main():
     adata = annotate(args.dataset)
     create_comps_for_workers(
         args.dataset, adata,
-        train_sizes=train_sizes, repeats_per_size=repeats_per_size,
+        train_sizes=train_sizes, 
+        repeats_per_size=repeats_per_size,
+        include_hard=True
         )
 
 if __name__ == "__main__":

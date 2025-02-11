@@ -3,6 +3,7 @@ Utilizing compositions according to the Annotatability model to detect optimal s
 
 ## Tips
 - The task of iteratively searching through all compositions is an expensive one that takes long. It's therefore recommended to run the tasks via the optimized .sh scripts available, which create sbatch jobs rather than .ipynb notebooks.
+- For a parallel run (see relevant section) you also have the option to not consider composition that include HARD examples at all, greatly reducing computation time. To do so, set `        include_hard=False` in `Parallel_run/tasker.py`.
 - The provided datasets were preprocessed according to the authour's discretion. Make sure to check that they match your excpectations. See `Datasets/<dataset name>.py`.
 
 ## Getting Started
