@@ -3,7 +3,7 @@ set -e
 
 # Load shared configuration
 source ~/.config/annoTransfer.conf || exit 1
-: "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
+: "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${VENV_PATH:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
 : "${DATASET_NAME:?}" "${TRANS_DATASET_NAME:?}"
 
 # SLURM Configuration
