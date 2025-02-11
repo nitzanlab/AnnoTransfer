@@ -24,7 +24,7 @@ class PBMC(Dataset):
         
         # Parameters for pbmc (full)
         self.epoch_num_annot = 200
-        self.epoch_num_composition = 60
+        self.epoch_num_composition = 30
         self.swap_probability = 0.1
         self.percentile = 90
         self.batch_size = 64
