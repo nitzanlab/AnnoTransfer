@@ -20,7 +20,7 @@ source ~/.config/annoTransfer.conf || exit 1
 mkdir -p "${PROJECT_DIR}/slurm_out"
 
 # Validate critical paths
-if [ ! -f "$VENV_PATH" ]; then
+if [ ! -f "$VENV_PATH/bin/activate" ]; then
     echo "ERROR: Virtual environment not found at $VENV_PATH"
     echo "Please create virtual environment or update VENV_PATH in the script"
     exit 1
@@ -33,7 +33,7 @@ if [ ! -d "$PROJECT_DIR" ]; then
 fi
 
 # Activate virtual environment
-source "$VENV_PATH"
+source "$VENV_PATH/bin/activate"
 echo "Activated virtual environment: $(which python)"
 python --version
 
