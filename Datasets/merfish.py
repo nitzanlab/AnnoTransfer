@@ -6,7 +6,6 @@ import squidpy as sq
 
 class Merfish(Dataset):
     def load_data(self):
-        # Load data and save it as an instance attribute
         self.adata = sq.datasets.merfish()
         self.adata = self.preprocess_data()
 
@@ -18,6 +17,7 @@ class Merfish(Dataset):
         self.percentile = 90
         self.batch_size = 64
         self.manager = AnnDataManager()
+        self.name = "merfish"
 
         return self.adata
 

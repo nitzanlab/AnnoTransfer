@@ -38,15 +38,15 @@ For more details on datasets, see relevant section.
 #### 4.1 Parallel Run (recommended)
 In a parallel run, first a csv will be created with all compositions required. Then, workers will be dispatched until all compositions results were reported to `Results` directory.
 1. Edit the global parameter or the used dataset if you wish in `$PROJECT_DIR/Parallel_run/tasker.py`. Here you can control batch size, subsets size, repeats, the dataset used etc.
-2. On a machine with SLURM (such as phoenix) run `$PROJECT_DIR/Parallel_run/submit_parallel_run.sh`.
+2. On a machine with SLURM (such as phoenix) run `$PROJECT_DIR/Parallel_run/submit_parallel_run.sh`. You can safely exit the script after seeing `tasker_and_dispatcher job submitted with ID` as it summoned the job in the background.
 
-Note this can still take **very** long time, especially for the PBMC dataset configured by default. 
+Note this can still take **very** long time.
 However the script you just ran starts an up to days-long job on the cluster, so whenever you log out you can log back in and check on the progress. Keep the id provided in `Tasker job submitted with ID: <job_id>` to check on it later.
 For details and help see Parallel Run section.
 #### 4.2 Linear Run
 In a linear run, each composition will start training and reporting loss only once the one that preceded it completed.
-1. Edit the global parameter if you wish in `$PROJECT_DIR/Linear_run/optimal_compositions.sbatch`. Here you can control batch size, subsets size, repeats, the dataset used etc.
-2. If a machine with SLURM is available (such as phoenix) run `$PROJECT_DIR/Linear_run/optimal_compositions.sbatch`.
+1. Edit the global parameter if you wish in `$PROJECT_DIR/Linear_run/optimal_compositions.py`. Here you can control batch size, subsets size, repeats, the dataset used etc.
+2. If a machine with SLURM is available (such as phoenix) run `sbatch $PROJECT_DIR/Linear_run/test_compositions.sbatch`.
 Otherwise, run `$PROJECT_DIR/Linear_run/optimal_compositions.py` directly.
 
 Only recommended for small datasets and forgiving compositions constraints.

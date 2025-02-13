@@ -13,11 +13,8 @@ source ~/.config/annoTransfer.conf || exit 1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=42G
 #SBATCH --time=23:00:00
-#SBATCH --output=slurm_out/out.%j
-#SBATCH --error=slurm_out/err.%j
-
-# Create output directory
-mkdir -p "${PROJECT_DIR}/slurm_out"
+#SBATCH --output=test_compositions.%j
+#SBATCH --error=test_compositions.%j
 
 # Validate critical paths
 if [ ! -f "$VENV_PATH/bin/activate" ]; then
