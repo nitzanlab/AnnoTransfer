@@ -12,7 +12,7 @@ import pandas as pd
 from Models.mlp_net import train_and_evaluate_mlp
 from Datasets.pbmc import PBMC
 from Managers.anndata_manager import AnnDataManager
-from Scripts.annotability_automations import get_subset_composition
+from Scripts.annotatability_automations import get_subset_composition
 from Datasets.dataset import Dataset
 from Datasets.factory import get_dataset
 

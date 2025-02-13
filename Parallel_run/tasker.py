@@ -3,7 +3,7 @@
 import argparse
 import logging
 import torch
-from Scripts.annotability_automations import *
+from Scripts.annotatability_automations import *
 from Datasets.factory import get_dataset
 
 def main():

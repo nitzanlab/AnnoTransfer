@@ -7,7 +7,7 @@ import pandas as pd
 import scanpy as sc
 
 from collections import defaultdict
-from Scripts.annotability_automations import comp_opt_subset_to_not
+from Scripts.annotatability_automations import comp_opt_subset_to_not
 from Datasets.factory import get_dataset
 
 def load_results(results_dir):
