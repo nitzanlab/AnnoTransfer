@@ -9,8 +9,8 @@ from Datasets.factory import get_dataset
 
 ### GLOBAL PARAMETERS ###
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-repeats_per_size = 4
-train_sizes = [1000]
+repeats_per_size = 3
+train_sizes = [500, 750]
 ### END GLOBAL PARAMETERS ###
 
 # Read the data argument from the command line
@@ -36,9 +36,7 @@ format_manager = dataset.manager
 format_manager.general_info(adata)
 best_compositions, label_encoder = find_optimal_compositions(dataset_name, adata, label_key, train_sizes, 
                         repeats_per_size, device, epoch_num_composition, batch_size, format_manager)
-visualize_optimal_compositions_with_std(dataset_name)
-annot_bar_chart(dataset_name)
-highest_confidence_samples(adata, train_sizes, device, label_encoder, dataset_name, label_key)
+
 for T in train_sizes:
     E, A, H = best_compositions[T]['composition']
     group_counts = {'Easy-to-learn': E, 'Ambiguous': A, 'Hard-to-learn': H}

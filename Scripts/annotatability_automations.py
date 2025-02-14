@@ -598,8 +598,81 @@ def visualize_optimal_compositions_with_std(dataset_name):
     plt.savefig(f'{dataset_name}_annot_std_chart.png')
     logging.info('Visualization saved as optimal_compositions.png')
 
+def visualize_optimal_compositions_stacked_bar(dataset_name):
+    """
+    Loads the '_optimal_compositions.csv' file, then creates
+    a stacked bar chart of Easy/Ambiguous/Hard counts vs. Train_Size.
+    """
+
+    csv_file = f"{dataset_name}_optimal_compositions.csv"
+    if not os.path.exists(csv_file):
+        print(f"CSV file {csv_file} not found.")
+        return
+
+    # Load the compositions from the CSV file
+    results_df = pd.read_csv(csv_file)
+
+    # Drop rows with missing composition columns
+    results_df = results_df.dropna(subset=['Easy', 'Ambiguous', 'Hard'])
+
+    # Convert columns to float/int
+    results_df['Easy'] = results_df['Easy'].astype(float)
+    results_df['Ambiguous'] = results_df['Ambiguous'].astype(float)
+    results_df['Hard'] = results_df['Hard'].astype(float)
+    results_df['Train_Size'] = results_df['Train_Size'].astype(int)
+
+    # Melt to reshape data for plotting
+    df_melted = results_df.melt(
+        id_vars=['Train_Size', 'Test_Loss'],
+        value_vars=['Easy', 'Ambiguous', 'Hard'],
+        var_name='Group',
+        value_name='Count'
+    )
+
+    # Pivot to get stacked structure
+    df_pivot = df_melted.pivot_table(
+        index='Train_Size',
+        columns='Group',
+        values='Count',
+        aggfunc='sum'
+    ).fillna(0)
+
+    # Define custom color palette
+    palette = {
+        'Easy': 'green',
+        'Ambiguous': 'orange',
+        'Hard': 'red'
+    }
+
+    plt.figure(figsize=(12, 6))
+    sns.set_style("whitegrid")
+
+    # Reorder columns for consistent stack order
+    df_pivot = df_pivot[['Easy', 'Ambiguous', 'Hard']]
+
+    ax = df_pivot.plot(
+        kind='bar',
+        stacked=True,
+        color=[palette[group] for group in ['Easy', 'Ambiguous', 'Hard']],
+        width=0.8,
+        edgecolor='none',
+        figsize=(12, 6)
+    )
+
+    ax.set_title(f'{dataset_name.upper()} Dataset: Optimal Group Composition vs. Train_Size')
+    ax.set_ylabel('Number of Cells')
+    ax.set_xlabel('Train_Size (Number of Cells)')
+    ax.legend(title='Group', bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax.set_xticklabels(df_pivot.index, rotation=45, ha='right')
+
+    plt.tight_layout()
+    plt.savefig(f'{dataset_name}_optimal_compositions_stacked_bar.png')
+    plt.show()
+
 def annot_bar_chart(best_compositions):
     df = pd.DataFrame(best_compositions)
+    # print columns
+    print(df.columns)
 
     # Prepare data for visualization
     df_melted = df.melt(
@@ -936,7 +1009,7 @@ def gather_and_aggregate_results(
 
     # 1) Read each JSON result file
     for fn in os.listdir(results_dir):
-        if fn.startswith("results_") and fn.endswith(".json"):
+        if (fn.startswith("results_") and fn.endswith(".json")):
             path = os.path.join(results_dir, fn)
             try:
                 with open(path, "r") as f:

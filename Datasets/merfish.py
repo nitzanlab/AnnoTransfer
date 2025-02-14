@@ -2,6 +2,7 @@
 from Datasets.dataset import Dataset
 from Managers.anndata_manager import AnnDataManager
 import scanpy as sc
+import logging
 import squidpy as sq
 
 class Merfish(Dataset):
@@ -25,6 +26,9 @@ class Merfish(Dataset):
         sc.pp.normalize_per_cell(self.adata, counts_per_cell_after=1e4)
         sc.pp.log1p(self.adata)
 
+        logging.info("Existing cell types: ")
+        logging.info(self.adata.obs['Cell_class'].value_counts())
+
         # Map clusters to cell types
         cell_type_mapping = {
             'OD Mature 2': 'OD Mature',
@@ -44,4 +48,7 @@ class Merfish(Dataset):
             'OD Immature 2': 'OD Immature'
         }
         self.adata.obs['CellType'] = self.adata.obs['Cell_class'].map(cell_type_mapping).fillna(self.adata.obs['Cell_class'])
+        logging.info("Transformed to: ")
+        logging.info(self.adata.obs['Cell_class'].value_counts())
+
         return self.adata
