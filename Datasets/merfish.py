@@ -49,6 +49,6 @@ class Merfish(Dataset):
         }
         self.adata.obs['CellType'] = self.adata.obs['Cell_class'].map(cell_type_mapping).fillna(self.adata.obs['Cell_class'])
         logging.info("Transformed to: ")
-        logging.info(self.adata.obs['Cell_class'].value_counts())
+        logging.info(self.adata.obs['CellType'].value_counts())
 
         return self.adata

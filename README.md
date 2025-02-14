@@ -7,9 +7,11 @@ Utilizing compositions according to the Annotatability model to detect optimal s
 - The provided datasets were preprocessed according to the authour's discretion. Make sure to check that they match your excpectations. See `Datasets/<dataset name>.py`.
 
 ## Getting Started
-### 1.Clone the library. 
+### 0. Local introduction
+To see locally what the library can do, follow the pre-compiled `example.ipynb` notebook. What follows is a comprehensive guide for running optimal compositions search on a computationally strong remote (i.e. phoenix for HUJI users) and all actions should be done on the remote.
+### 1. Clone the library. 
 Sufficiently large space is required for many of the tasks and datasets. For phoenix cluster users, it's therefore recommended to clone it to their lab directory.
-### 2.Set up configuration files
+### 2. Set up configuration files
 Use `vi ~/.config/annoTransfer.conf` and paste the following into the newly created file:
 ```
 # ~/.config/annoTransfer.conf
@@ -27,9 +29,9 @@ Other paths can remain as they are if you're not making additional changes
 (type `:wq` to save the file and exit).
 
 Now run `source ~/.config/annoTransfer.conf` to apply the variables to your environment. Run that command on every session you wish to acess these variables. (scripts in the library use them by default).
-### 3.Install virtual environment
+### 3. Install virtual environment
 Run `$PROJECT_DIR/Scripts/build_venv.sh`.
-### 4.Run
+### 4. Run
 We we'll demonstrate running on a PBMC CVID dataset. To obtain it, run:
 ```
 wget -O $PROJECT_DIR/datasets/pbmc_cvid.h5ad "https://datasets.cellxgene.cziscience.com/dfb51f99-a306-4daa-9f4a-afe7de65bbf2.h5ad"
