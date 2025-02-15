@@ -4,7 +4,6 @@ import json
 import os
 import glob
 import pandas as pd
-import scanpy as sc
 
 from collections import defaultdict
 from Scripts.annotatability_automations import comp_opt_subset_to_not

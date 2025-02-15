@@ -1039,7 +1039,7 @@ def gather_and_aggregate_results(
 
     # Ensure the relevant columns exist
     required_cols = ["Train_Size", "Easy", "Ambiguous", "Hard", "Test_Loss", "Run", 
-                     "Train_Indices", "Test_Indices"]
+                        "Train_Indices", "Test_Indices"]
     missing = [c for c in required_cols if c not in df.columns]
     if missing:
         logging.error(f"Missing columns in the results data: {missing}")

@@ -104,6 +104,7 @@ TOTAL_ROWS=$(($(wc -l < "$CSV_FILE") - 1))
 # 3) Calculate chunks
 NUM_CHUNKS=$(( (TOTAL_ROWS + CHUNK_SIZE - 1) / CHUNK_SIZE ))
 echo "Dispatching $NUM_CHUNKS chunks total for $TOTAL_ROWS rows..."
+echo "creating logs in $RESULTS_DIR/logs"
 
 # 4) Job queue monitoring
 jobs_in_queue() {
@@ -132,9 +133,9 @@ for ((i=0; i<NUM_CHUNKS; i++)); do
 #!/bin/bash
 #SBATCH --job-name=worker_${DATASET_NAME}_chunk_${i}
 #SBATCH --array=0-$((CHUNK_SIZE-1))
-#SBATCH --time=5:00:00
+#SBATCH --time=2:00:00
 #SBATCH --mem=16G
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=4
 #SBATCH --output=${RESULTS_DIR}/logs/out.%A_%a
 #SBATCH --error=${RESULTS_DIR}/logs/err.%A_%a
 #SBATCH --killable
@@ -169,28 +170,103 @@ done
 
 echo "All $NUM_CHUNKS chunks submitted (queue limit: $MAX_JOBS_IN_QUEUE)."
 
-# ----------------------
-# Post-processing
-# ----------------------
-
-# Wait for all chunk jobs to complete
+# Wait for all chunk jobs to complete (initial submission)
 echo "Waiting for all chunk jobs to complete..."
+
+# show how many completed in background
+find "$RESULTS_DIR" -name "results_*.json" -exec grep -l '"Test_Loss"' {} + | wc -l &
+
 for job_id in "${chunk_job_ids[@]}"; do
     while squeue -j "$job_id" 2>/dev/null | grep -q "$job_id"; do
         sleep 30
     done
 done
 
-# Generate completion report
+# Function to find which rows don't have a results file yet
+incomplete_rows() {
+    local missing_ids=()
+    for ((rid=0; rid<"$TOTAL_ROWS"; rid++)); do
+        if ! ls "${RESULTS_DIR}/results_${rid}_*.json" 1>/dev/null 2>&1; then
+            missing_ids+=("$rid")
+        fi
+    done
+    echo "${missing_ids[@]}"
+}
+
+MAX_RESUBMIT=5
+attempt=1
+
+while [ "$attempt" -le "$MAX_RESUBMIT" ]; do
+    completed_jobs=$(find "$RESULTS_DIR" -name "results_*.json" -exec grep -l '"Test_Loss"' {} + | wc -l)
+    if [ "$completed_jobs" -eq "$TOTAL_ROWS" ]; then
+        echo "All $TOTAL_ROWS jobs completed successfully."
+        break
+    fi
+
+    echo "Some rows did not complete. Attempt #$attempt at resubmitting..."
+    missing_ids=( $(incomplete_rows) )
+    if [ "${#missing_ids[@]}" -eq 0 ]; then
+        echo "No incomplete rows found, but $completed_jobs/$TOTAL_ROWS have results. Stopping."
+        break
+    fi
+
+    # Construct SLURM array range by grouping missing ids
+    # e.g. 1-3,5,7 for missing rows [1,2,3,5,7], if you prefer
+    # Here we'll just resubmit them as one array chunk:
+    missing_min="${missing_ids[0]}"
+    missing_max="${missing_ids[-1]}"
+    
+    submission_output=$(sbatch --parsable <<EOT 2>&1
+#!/bin/bash
+#SBATCH --job-name=retry_worker_${DATASET_NAME}_${attempt}
+#SBATCH --array=${missing_min}-${missing_max}
+#SBATCH --time=2:00:00
+#SBATCH --mem=16G
+#SBATCH --cpus-per-task=4
+#SBATCH --output=${RESULTS_DIR}/logs/out.retry.%A_%a
+#SBATCH --error=${RESULTS_DIR}/logs/err.retry.%A_%a
+#SBATCH --killable
+#SBATCH --requeue
+
+source "$VENV_PATH/bin/activate"
+
+ROW_ID=\${SLURM_ARRAY_TASK_ID}
+if [[ " ${missing_ids[*]} " =~ " \$ROW_ID " ]]; then
+    srun python "$WORKER_SCRIPT" \\
+        --csv_file="$CSV_FILE" \\
+        --row_id="\$ROW_ID" \\
+        --output_dir="$RESULTS_DIR" \\
+        --dataset_name="$DATASET_NAME"
+else
+    echo "Skipping row \$ROW_ID because it's already complete."
+fi
+EOT
+    )
+
+    echo "Retry submitted as job ID: $submission_output"
+    
+    # Wait for this retry job array to complete
+    while squeue -j "$submission_output" 2>/dev/null | grep -q "$submission_output"; do
+        sleep 30
+    done
+    
+    attempt=$((attempt + 1))
+done
+
+# ----------------------
+# Post-processing
+# ----------------------
+
 echo "Generating completion report..."
 completed_jobs=$(find "$RESULTS_DIR" -name "results_*.json" -exec grep -l '"Test_Loss"' {} + | wc -l)
-echo "Successfully completed jobs with loss: $completed_jobs/$TOTAL_ROWS"
+echo "$completed_jobs/$TOTAL_ROWS jobs completed successfully. See $RESULTS_DIR/logs for more details."
 
-# Submit analysis job
-echo "Submitting analysis job..."
-sbatch --dependency=afterok:$(echo "${chunk_job_ids[@]}" | tr ' ' ':') <<EOF
+# Submit analysis job (depends on all completions)
+if [ "$completed_jobs" -eq "$TOTAL_ROWS" ]; then
+    echo "Submitting analysis job..."
+    sbatch --dependency=afterok:$(echo "${chunk_job_ids[@]}" | tr ' ' ':') <<EOF
 #!/bin/bash
-#SBATCH --job-name=post_analysis
+#SBATCH --job-name=post_analysis_${DATASET_NAME}
 #SBATCH --time=4:00:00
 #SBATCH --mem=16G
 #SBATCH --output=${RESULTS_DIR}/analysis.out
@@ -202,3 +278,10 @@ python3 "$PROJECT_DIR/Parallel_run/analyze_results.py" \\
     --dataset_name="$DATASET_NAME" \\
     --trans_dataset_name="$TRANS_DATASET_NAME"
 EOF
+
+    echo "Analysis job submitted. Monitor progress in ${RESULTS_DIR}/analysis.out"
+    tail -F "${RESULTS_DIR}/analysis.out" "${RESULTS_DIR}/analysis.err" &
+    tail_pid=$!
+else
+    echo "Not all jobs completed after $MAX_RESUBMIT retry attempts. Analysis job not submitted."
+fi
