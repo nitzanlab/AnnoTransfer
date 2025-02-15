@@ -1,12 +1,5 @@
 #!/bin/bash
-set -e
 
-# Load shared configuration
-source ~/.config/annoTransfer.conf || exit 1
-: "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${VENV_PATH:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
-: "${DATASET_NAME:?}" "${TRANS_DATASET_NAME:?}"
-
-# SLURM Configuration
 #SBATCH --job-name=test_compositions
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1,vmem:32G
@@ -15,6 +8,11 @@ source ~/.config/annoTransfer.conf || exit 1
 #SBATCH --time=23:00:00
 #SBATCH --output=test_compositions_%j.log
 #SBATCH --error=test_compositions_%j.err
+
+# Load shared configuration
+source ~/.config/annoTransfer.conf || exit 1
+: "${PROJECT_DIR:?}" "${VENV_NAME:?}" "${VENV_PATH:?}" "${TMP_DIR:?}" "${CACHE_DIR:?}"
+: "${DATASET_NAME:?}" "${TRANS_DATASET_NAME:?}"
 
 # Validate critical paths
 if [ ! -f "$VENV_PATH/bin/activate" ]; then
