@@ -3,7 +3,7 @@ Utilizing compositions according to the Annotatability model to detect optimal s
 
 ## Tips
 - The task of iteratively searching through all compositions is an expensive one that takes long. It's therefore recommended to run the tasks via the optimized .sh scripts available, which create sbatch jobs rather than .ipynb notebooks.
-- For a parallel run (see relevant section) you also have the option to not consider composition that include HARD examples at all, greatly reducing computation time. To do so, set `        include_hard=False` in `Parallel_run/tasker.py`.
+- For a parallel run (see relevant section) you also have the option to not consider composition that include HARD examples at all, greatly reducing computation time. To do so, set `include_hard=False` in `Parallel_run/tasker.py`.
 - The provided datasets were preprocessed according to the authour's discretion. Make sure to check that they match your excpectations. See `Datasets/<dataset name>.py`.
 
 ## Getting Started
@@ -37,10 +37,12 @@ We we'll demonstrate running on a PBMC CVID dataset. To obtain it, run:
 wget -O $PROJECT_DIR/datasets/pbmc_cvid.h5ad "https://datasets.cellxgene.cziscience.com/dfb51f99-a306-4daa-9f4a-afe7de65bbf2.h5ad"
 ```
 For more details on datasets, see relevant section.
-#### 4.1 Parallel Run (recommended)
+#### 4.1 Parallel Run
 In a parallel run, first a csv will be created with all compositions required. Then, workers will be dispatched until all compositions results were reported to `Results` directory.
 1. Edit the global parameter or the used dataset if you wish in `$PROJECT_DIR/Parallel_run/tasker.py`. Here you can control batch size, subsets size, repeats, the dataset used etc.
 2. On a machine with SLURM (such as phoenix) run `$PROJECT_DIR/Parallel_run/submit_parallel_run.sh`. You can safely exit the script after seeing `tasker_and_dispatcher job submitted with ID` as it summoned the job in the background.
+
+Tip: depending on the dataset at hand, you will need to adjust the video memory, GPU, CPUs, and physical memory used - though a more demending request will take longer before a node is available. You can make this change at the every section of `$PROJECT_DIR/Parallel_run/tasker_and_dispatcher.sh`. Each section (tasker, worker job, resubmission, analyzer) may benefit from tweaks appropriate to their compuatational demend. Some expermenetation may be required.
 
 Note this can still take **very** long time.
 However the script you just ran starts an up to days-long job on the cluster, so whenever you log out you can log back in and check on the progress. Keep the id provided in `Tasker job submitted with ID: <job_id>` to check on it later.
@@ -50,6 +52,7 @@ In a linear run, each composition will start training and reporting loss only on
 1. Edit the global parameter if you wish in `$PROJECT_DIR/Linear_run/optimal_compositions.py`. Here you can control batch size, subsets size, repeats, the dataset used etc.
 2. If a machine with SLURM is available (such as phoenix) run `sbatch $PROJECT_DIR/Linear_run/test_compositions.sbatch`.
 Otherwise, run `$PROJECT_DIR/Linear_run/optimal_compositions.py` directly.
+Tip for SLURM users: depending on the dataset at hand, you will need to adjust the video memory, GPU, and physical memory used - though a more demending request will take longer before a node is available. You can make this change at the top of the `$PROJECT_DIR/Linear_run/test_compositions.sbatch` file.
 
 Only recommended for small datasets and forgiving compositions constraints.
 ## Datasets
