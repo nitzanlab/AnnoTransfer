@@ -172,9 +172,15 @@ echo "All $NUM_CHUNKS chunks submitted (queue limit: $MAX_JOBS_IN_QUEUE)."
 
 # Wait for all chunk jobs to complete (initial submission)
 echo "Waiting for all chunk jobs to complete..."
+echo "Monitor progress in $RESULTS_DIR/logs/out.* and $RESULTS_DIR/logs/err.*"
 
-# show how many completed in background
-find "$RESULTS_DIR" -name "results_*.json" -exec grep -l '"Test_Loss"' {} + | wc -l &
+# show how many completed in background every 15 minutes
+while true; do
+    completed_jobs=$(find "$RESULTS_DIR" -name "results_*.json" -exec grep -l '"Test_Loss"' {} + | wc -l)
+    echo "$completed_jobs/$TOTAL_ROWS jobs completed successfully so far."
+    sleep 900
+done &
+progress_pid=$!
 
 for job_id in "${chunk_job_ids[@]}"; do
     while squeue -j "$job_id" 2>/dev/null | grep -q "$job_id"; do

@@ -13,8 +13,8 @@ source ~/.config/annoTransfer.conf || exit 1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=42G
 #SBATCH --time=23:00:00
-#SBATCH --output=test_compositions.%j
-#SBATCH --error=test_compositions.%j
+#SBATCH --output=test_compositions_%j.log
+#SBATCH --error=test_compositions_%j.err
 
 # Validate critical paths
 if [ ! -f "$VENV_PATH/bin/activate" ]; then
