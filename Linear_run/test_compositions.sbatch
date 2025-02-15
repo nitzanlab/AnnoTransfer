@@ -1,13 +1,12 @@
 #!/bin/bash
 
 #SBATCH --job-name=test_compositions
-#SBATCH --nodes=1
+#SBATCH --time=3-00:00:00
+#SBATCH --output=test_compositions_%j.log
+#SBATCH --error=test_compositions_%j.err
 #SBATCH --gres=gpu:1,vmem:32G
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=42G
-#SBATCH --time=23:00:00
-#SBATCH --output=test_compositions_%j.log
-#SBATCH --error=test_compositions_%j.err
 
 # Load shared configuration
 source ~/.config/annoTransfer.conf || exit 1
