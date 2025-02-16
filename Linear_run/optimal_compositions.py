@@ -38,7 +38,8 @@ best_compositions, label_encoder = find_optimal_compositions(dataset_name, adata
                         repeats_per_size, device, epoch_num_composition, batch_size, format_manager)
 
 for T in train_sizes:
-    E, A, H = best_compositions[T]['composition']
+    best_entry = min(best_compositions[T], key=lambda x: x["Test_Loss"])
+    E, A, H = best_entry['composition']
     group_counts = {'Easy-to-learn': E, 'Ambiguous': A, 'Hard-to-learn': H}
     # compare dataset with optimal composition subset to not optimal composition subset and to full dataset
     comp_opt_subset_to_not(dataset_name, adata, label_key, group_counts, epoch_num_composition, epoch_num_annot, batch_size, format_manager)
