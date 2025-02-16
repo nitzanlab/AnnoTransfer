@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=test_compositions
 #SBATCH --time=3-00:00:00
-#SBATCH --output=test_compositions_%j.log
+#SBATCH --output=test_compositions_%j.out
 #SBATCH --error=test_compositions_%j.err
 #SBATCH --gres=gpu:1,vmem:32G
 #SBATCH --cpus-per-task=16

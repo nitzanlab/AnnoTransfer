@@ -272,11 +272,13 @@ if [ "$completed_jobs" -eq "$TOTAL_ROWS" ]; then
     echo "Submitting analysis job..."
     sbatch --dependency=afterok:$(echo "${chunk_job_ids[@]}" | tr ' ' ':') <<EOF
 #!/bin/bash
-#SBATCH --job-name=post_analysis_${DATASET_NAME}
-#SBATCH --time=4:00:00
+#SBATCH --job-name=analysis_${DATASET_NAME}
+#SBATCH --time=6:00:00
+#SBATCH --output=${RESULTS_DIR}/analysis/analysis.out
+#SBATCH --error=${RESULTS_DIR}/analysis/analysis.err
+#SBATCH --gres=gpu:1,vmem:16G
+#SBATCH --cpus-per-task=16
 #SBATCH --mem=16G
-#SBATCH --output=${RESULTS_DIR}/analysis.out
-#SBATCH --error=${RESULTS_DIR}/analysis.err
 
 source "$VENV_PATH/bin/activate"
 python3 "$PROJECT_DIR/Parallel_run/analyze_results.py" \\
