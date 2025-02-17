@@ -2,9 +2,9 @@
 Utilizing compositions according to the Annotatability model to detect optimal subsets to be used for transfer learning.
 
 ## Tips
-- The task of iteratively searching through all compositions is an expensive one that takes long. It's therefore recommended to run the tasks via the optimized .sh scripts available, which create sbatch jobs rather than .ipynb notebooks.
+- The task of iteratively searching through all compositions is an expensive one that takes long. It's therefore recommended to run the tasks via the optimized .sh scripts available, which create sbatch jobs rather than .ipynb notebooks, which could later be used for evaluation.
 - For a parallel run (see relevant section) you also have the option to not consider composition that include HARD examples at all, greatly reducing computation time. To do so, set `include_hard=False` in `Parallel_run/tasker.py`.
-- The provided datasets were preprocessed according to the authour's discretion. Make sure to check that they match your excpectations. See `Datasets/<dataset name>.py`.
+- The provided datasets were preprocessed according to the author's discretion. Make sure to check that they match your excpectations. See `Datasets/<dataset name>.py`.
 
 ## Getting Started
 ### 0. Local introduction
@@ -37,6 +37,9 @@ We we'll demonstrate running on a PBMC CVID dataset. To obtain it, run:
 wget -O $PROJECT_DIR/datasets/pbmc_cvid.h5ad "https://datasets.cellxgene.cziscience.com/dfb51f99-a306-4daa-9f4a-afe7de65bbf2.h5ad"
 ```
 For more details on datasets, see relevant section.
+
+Next, you can choose either to run all compositions on a single strong GPU sequentially through 4.2 linear run, or simultaneously through 4.1 Parallel run on many CPUs rather than GPUs. It's hard to tell upfront which is better, and 4.1 is heavily dependent on the remote's availability. You can always try both.
+
 #### 4.1 Parallel Run
 In a parallel run, first a csv will be created with all compositions required. Then, workers will be dispatched until all compositions results were reported to `Results` directory.
 1. Edit the global parameter or the used dataset if you wish in `$PROJECT_DIR/Parallel_run/tasker.py`. Here you can control batch size, subsets size, repeats, the dataset used etc.
@@ -54,7 +57,6 @@ In a linear run, each composition will start training and reporting loss only on
 Otherwise, run `$PROJECT_DIR/Linear_run/optimal_compositions.py` directly.
 Tip for SLURM users: depending on the dataset at hand, you will need to adjust the video memory, GPU, and physical memory used - though a more demending request will take longer before a node is available. You can make this change at the top of the `$PROJECT_DIR/Linear_run/test_compositions.sbatch` file.
 
-Only recommended for small datasets and forgiving compositions constraints.
 ## Datasets
 Each Dataset should configured according to the interface determined in `Datasets/dataset.py`.
 Two existing example for implementation can be found in:
